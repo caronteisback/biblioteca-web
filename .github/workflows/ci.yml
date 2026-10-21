@@ -34,3 +34,5 @@ jobs:
       - uses: actions/checkout@v7
       - name: Build the image
         run: docker build -t biblioteca-web:ci .
+      - name: The proxy keeps the port of the Host sent to the API
+        run: sh scripts/probar-proxy.sh biblioteca-web:ci

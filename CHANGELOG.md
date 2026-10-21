@@ -2,6 +2,13 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.1] - 2026-10-21
+
+### Fixed
+
+- **Every POST, PUT and DELETE through the nginx image was refused with 403** (signing in included). A browser sends `Origin: http://localhost:8081` with them, but nginx forwarded `Host: localhost` without the port, so the API took the request for one from another site. nginx now forwards the Host as received (`$http_host`). Reads (GET) carry no `Origin`, which is why the lists worked and the bug went unseen.
+- `scripts/probar-proxy.sh` reproduces it: it starts the image in front of a fake API that echoes the Host it receives, and fails if the port is missing. CI runs it.
+
 ## [0.2.0] - 2026-10-21
 
 **Breaking:** the panel needs the API 0.3.0 (contract v0.2.1): every operation now asks for a token.
