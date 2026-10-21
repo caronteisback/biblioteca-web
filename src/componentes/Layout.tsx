@@ -8,6 +8,8 @@ export function Layout() {
         <nav aria-label="Principal">
           <NavLink to="/libros">Libros</NavLink>
           <NavLink to="/socios">Socios</NavLink>
+          <NavLink to="/prestamos">Préstamos</NavLink>
+          <NavLink to="/multas">Multas</NavLink>
         </nav>
       </header>
       <main>

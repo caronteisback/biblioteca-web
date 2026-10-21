@@ -10,6 +10,9 @@ export type Socio = components['schemas']['SocioResponse']
 export type SocioResumen = components['schemas']['SocioResumen']
 export type SocioPedido = components['schemas']['SocioRequest']
 export type Alerta = components['schemas']['Alerta']
+export type Prestamo = components['schemas']['PrestamoResponse']
+export type Multa = components['schemas']['MultaResponse']
+export type EstadoMulta = Multa['estado']
 
 /** One page of a list, as every list of the API answers it. */
 export interface Pagina<T> {
@@ -84,6 +87,7 @@ export function crearApi(cliente = crearCliente()) {
         ),
       crear: (libroId: number, codigo: string) =>
         resolver(cliente.POST('/api/v1/libros/{libroId}/ejemplares', { params: { path: { libroId } }, body: { codigo } })),
+      obtener: (id: number) => resolver(cliente.GET('/api/v1/ejemplares/{id}', { params: { path: { id } } })),
       darDeBaja: (id: number) => resolver(cliente.POST('/api/v1/ejemplares/{id}/baja', { params: { path: { id } } })),
       reactivar: (id: number) => resolver(cliente.POST('/api/v1/ejemplares/{id}/alta', { params: { path: { id } } })),
       eliminar: (id: number) =>
@@ -101,6 +105,22 @@ export function crearApi(cliente = crearCliente()) {
       reactivar: (id: number) =>
         resolver(cliente.POST('/api/v1/socios/{id}/reactivar', { params: { path: { id } } })),
       eliminar: (id: number) => resolverVacio(cliente.DELETE('/api/v1/socios/{id}', { params: { path: { id } } })),
+    },
+    prestamos: {
+      listar: (consulta: Omit<Consulta, 'q'> & { socioId?: number; activo?: boolean } = {}) =>
+        resolver(cliente.GET('/api/v1/prestamos', { params: { query: consulta } })),
+      obtener: (id: number) => resolver(cliente.GET('/api/v1/prestamos/{id}', { params: { path: { id } } })),
+      crear: (socioId: number, ejemplarId: number) =>
+        resolver(cliente.POST('/api/v1/prestamos', { body: { socioId, ejemplarId } })),
+      renovar: (id: number) =>
+        resolver(cliente.POST('/api/v1/prestamos/{id}/renovacion', { params: { path: { id } } })),
+      devolver: (id: number) =>
+        resolver(cliente.POST('/api/v1/prestamos/{id}/devolucion', { params: { path: { id } } })),
+    },
+    multas: {
+      listar: (consulta: Omit<Consulta, 'q'> & { socioId?: number; estado?: EstadoMulta } = {}) =>
+        resolver(cliente.GET('/api/v1/multas', { params: { query: consulta } })),
+      pagar: (id: number) => resolver(cliente.POST('/api/v1/multas/{id}/pago', { params: { path: { id } } })),
     },
   }
 }

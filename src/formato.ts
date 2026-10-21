@@ -11,3 +11,14 @@ export function estadoDelEjemplar(ejemplar: Pick<Ejemplar, 'activo' | 'disponibl
   if (!ejemplar.activo) return 'De baja'
   return ejemplar.disponible ? 'Disponible' : 'Prestado'
 }
+
+/** 5 as "S/ 5.00". */
+export function formatearSoles(monto: number): string {
+  return `S/ ${monto.toFixed(2)}`
+}
+
+/** A loan is "Devuelto" when returned, "Vencido" when active and late, "Activo" otherwise. */
+export function estadoDelPrestamo(prestamo: { activo: boolean; diasRetraso: number }): string {
+  if (!prestamo.activo) return 'Devuelto'
+  return prestamo.diasRetraso > 0 ? 'Vencido' : 'Activo'
+}

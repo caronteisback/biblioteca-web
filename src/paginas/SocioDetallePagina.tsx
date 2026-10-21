@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { ALERTAS } from '../api/alertas.ts'
 import { useApi } from '../api/contexto.ts'
+import { ActividadDelSocio } from '../componentes/ActividadDelSocio.tsx'
 import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
@@ -87,6 +88,7 @@ function SocioDetalle({ id }: { id: number }) {
               </button>
             </div>
             {errorAccion !== null && <AvisoError error={errorAccion} />}
+            <ActividadDelSocio socioId={socio.id} activo={socio.activo} />
           </>
         )}
       </CargaVista>

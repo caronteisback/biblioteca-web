@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estadoDelEjemplar, formatearDia } from './formato.ts'
+import { estadoDelEjemplar, estadoDelPrestamo, formatearDia, formatearSoles } from './formato.ts'
 
 describe('formatearDia', () => {
   it('writes a day as day/month/year', () => {
@@ -17,5 +17,20 @@ describe('estadoDelEjemplar', () => {
     expect(estadoDelEjemplar({ activo: false, disponible: false })).toBe('De baja')
     expect(estadoDelEjemplar({ activo: true, disponible: false })).toBe('Prestado')
     expect(estadoDelEjemplar({ activo: true, disponible: true })).toBe('Disponible')
+  })
+})
+
+describe('formatearSoles', () => {
+  it('writes money with the sol sign and two decimals', () => {
+    expect(formatearSoles(5)).toBe('S/ 5.00')
+    expect(formatearSoles(2.5)).toBe('S/ 2.50')
+  })
+})
+
+describe('estadoDelPrestamo', () => {
+  it('tells returned, overdue and active apart', () => {
+    expect(estadoDelPrestamo({ activo: false, diasRetraso: 3 })).toBe('Devuelto')
+    expect(estadoDelPrestamo({ activo: true, diasRetraso: 3 })).toBe('Vencido')
+    expect(estadoDelPrestamo({ activo: true, diasRetraso: 0 })).toBe('Activo')
   })
 })

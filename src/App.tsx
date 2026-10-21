@@ -4,6 +4,10 @@ import { NoEncontrada } from './componentes/NoEncontrada.tsx'
 import { LibroDetallePagina } from './paginas/LibroDetallePagina.tsx'
 import { LibroFormPagina } from './paginas/LibroFormPagina.tsx'
 import { LibrosPagina } from './paginas/LibrosPagina.tsx'
+import { MultasPagina } from './paginas/MultasPagina.tsx'
+import { NuevoPrestamoPagina } from './paginas/NuevoPrestamoPagina.tsx'
+import { PrestamoDetallePagina } from './paginas/PrestamoDetallePagina.tsx'
+import { PrestamosPagina } from './paginas/PrestamosPagina.tsx'
 import { SocioDetallePagina } from './paginas/SocioDetallePagina.tsx'
 import { SocioFormPagina } from './paginas/SocioFormPagina.tsx'
 import { SociosPagina } from './paginas/SociosPagina.tsx'
@@ -21,6 +25,10 @@ function App() {
         <Route path="socios/nuevo" element={<SocioFormPagina />} />
         <Route path="socios/:id" element={<SocioDetallePagina />} />
         <Route path="socios/:id/editar" element={<SocioFormPagina edicion />} />
+        <Route path="prestamos" element={<PrestamosPagina />} />
+        <Route path="prestamos/nuevo" element={<NuevoPrestamoPagina />} />
+        <Route path="prestamos/:id" element={<PrestamoDetallePagina />} />
+        <Route path="multas" element={<MultasPagina />} />
         <Route path="*" element={<NoEncontrada />} />
       </Route>
     </Routes>

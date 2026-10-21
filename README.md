@@ -12,15 +12,15 @@ Browser frontend of the library system: the librarian's panel for the catalog, m
 
 ## Status
 
-Working so far: the catalog (books and their copies) and the members. Loans and fines come next.
+Working: the catalog (books and their copies), the members, the loans and the fines: the whole life of a loan from the browser. Left: a pass of tests and polish, and the login once the API has one.
 
 | Step | What | State |
 |------|------|-------|
 | 1 | Project skeleton, CORS, CI | done |
 | 2 | API client with types generated from the contract | done |
 | 3 | Catalog and members | done |
-| 4 | Loans and fines | next |
-| 5 | Tests and polish | planned |
+| 4 | Loans and fines | done |
+| 5 | Tests and polish | next |
 
 There is no login yet: the API has no authentication, so this panel is for local use only and must not be exposed to a network.
 
@@ -58,9 +58,13 @@ The API address is `http://localhost:8080` by default. To change it, copy `.env.
 | Book | `/libros/:id` | Details, delete, and its **copies**: add, retire, restore and delete, with the state of each (available, on loan, retired) |
 | Members | `/socios` | Paginated list with a search on name or email |
 | New and edit member | `/socios/nuevo`, `/socios/:id/editar` | Forms |
-| Member | `/socios/:id` | Details, **score** and **alerts** (calculated by the API), deactivate, reactivate and delete |
+| Member | `/socios/:id` | Details, **score** and **alerts** (calculated by the API), deactivate, reactivate and delete; its active loans and pending fines, and a button to lend |
+| Loans | `/prestamos` | Paginated list, filtered by state (all, active, returned) and by member; each loan shows active, overdue (with the days) or returned |
+| New loan | `/prestamos/nuevo` | Pick a member and one of the **available** copies (search, then choose); it opens already filled when it comes from a member or from a copy |
+| Loan | `/prestamos/:id` | Member and copy by name, dates, renewals and alerts; **renew** and **return**; the fine that a late return created |
+| Fines | `/multas` | Paginated list, filtered by state and by member; **pay** a pending fine (whole, once) |
 
-Every screen goes through the typed client below and shows each failure with the message of its error code.
+Every screen goes through the typed client below and shows each failure with the message of its error code. The rules of lending live in the API, not here: when it refuses (a pending fine, a low score, the limit of loans, a loan that is overdue and cannot be renewed...) the screen only explains why, in Spanish.
 
 ## The API client and the contract
 

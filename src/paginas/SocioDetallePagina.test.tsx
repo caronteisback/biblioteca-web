@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
-import { renderizar } from '../pruebas/renderizar.ts'
+import { pagina, renderizar } from '../pruebas/renderizar.ts'
 import { SocioDetallePagina } from './SocioDetallePagina.tsx'
 
 const socio = {
@@ -16,12 +16,18 @@ const socio = {
   alertas: [{ code: 'PENDING_FINE', message: 'The member has a pending fine.' }],
 }
 
-function pantalla(api: unknown, ruta = '/socios/5') {
+/** What every test needs besides the member itself: the member has no loans and no fines. */
+const sinActividad = {
+  prestamos: { listar: vi.fn().mockResolvedValue(pagina([])) },
+  multas: { listar: vi.fn().mockResolvedValue(pagina([])) },
+}
+
+function pantalla(api: object, ruta = '/socios/5') {
   renderizar(
     <Routes>
       <Route path="/socios/:id" element={<SocioDetallePagina />} />
     </Routes>,
-    { api, ruta },
+    { api: { ...sinActividad, ...api }, ruta },
   )
 }
 

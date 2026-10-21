@@ -1,4 +1,5 @@
 import { useCallback, useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 import { useApi } from '../api/contexto.ts'
 import type { Ejemplar } from '../api/cliente.ts'
 import { useCargar } from '../hooks/useCargar.ts'
@@ -69,6 +70,11 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
                           </span>
                         </td>
                         <td className="acciones">
+                          {ejemplar.activo && ejemplar.disponible && (
+                            <Link className="boton" to={`/prestamos/nuevo?ejemplarId=${ejemplar.id}`}>
+                              Prestar
+                            </Link>
+                          )}
                           {ejemplar.activo ? (
                             <button type="button" onClick={() => void ejecutar(() => api.ejemplares.darDeBaja(ejemplar.id))}>
                               Dar de baja

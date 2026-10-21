@@ -116,6 +116,7 @@ button,
 }
 
 button[type='submit'],
+button.principal,
 .boton {
   color: var(--acento-texto);
   background: var(--acento);
@@ -288,4 +289,72 @@ th {
   color: var(--aviso);
   background: var(--aviso-fondo);
   border-radius: 8px;
+}
+
+select {
+  display: block;
+  margin-top: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  color: var(--texto);
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+}
+
+.etiqueta-activo {
+  color: var(--ok);
+  background: var(--ok-fondo);
+}
+
+.etiqueta-vencido {
+  color: var(--error);
+  background: var(--error-fondo);
+}
+
+.etiqueta-devuelto {
+  color: var(--suave);
+}
+
+.aviso-aviso {
+  color: var(--aviso);
+  background: var(--aviso-fondo);
+}
+
+.selector {
+  padding: 0.75rem 1rem 1rem;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+.elegido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+.opciones,
+.lista-simple {
+  padding: 0;
+  margin: 0.5rem 0;
+  list-style: none;
+}
+
+.opciones li {
+  margin: 0.35rem 0;
+}
+
+.opciones button {
+  width: 100%;
+  text-align: left;
+}
+
+.lista-simple li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--borde);
 }
