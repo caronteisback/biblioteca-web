@@ -1,59 +1,29 @@
-import { useEffect, useState } from 'react'
-import { api } from './api/cliente.ts'
-import { mensajeDe } from './api/errores.ts'
-import { API_URL } from './config.ts'
-
-type Estado =
-  | { tipo: 'cargando' }
-  | { tipo: 'listo'; libros: number }
-  | { tipo: 'error'; detalle: string }
+import { Navigate, Route, Routes } from 'react-router'
+import { Layout } from './componentes/Layout.tsx'
+import { NoEncontrada } from './componentes/NoEncontrada.tsx'
+import { LibroDetallePagina } from './paginas/LibroDetallePagina.tsx'
+import { LibroFormPagina } from './paginas/LibroFormPagina.tsx'
+import { LibrosPagina } from './paginas/LibrosPagina.tsx'
+import { SocioDetallePagina } from './paginas/SocioDetallePagina.tsx'
+import { SocioFormPagina } from './paginas/SocioFormPagina.tsx'
+import { SociosPagina } from './paginas/SociosPagina.tsx'
 
 function App() {
-  const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' })
-
-  useEffect(() => {
-    let vigente = true
-    api.libros
-      .listar({ size: 1 })
-      .then((catalogo) => {
-        if (!vigente) return
-        setEstado({ tipo: 'listo', libros: catalogo.totalElements })
-      })
-      .catch((error: unknown) => {
-        if (!vigente) return
-        setEstado({ tipo: 'error', detalle: mensajeDe(error) })
-      })
-    return () => {
-      vigente = false
-    }
-  }, [])
-
   return (
-    <main>
-      <h1>Biblioteca</h1>
-      <p className="lead">Panel del bibliotecario</p>
-
-      <section aria-live="polite" className={`estado estado-${estado.tipo}`}>
-        {estado.tipo === 'cargando' && <p>Conectando con la API…</p>}
-        {estado.tipo === 'listo' && (
-          <>
-            <p className="titulo">API conectada</p>
-            <p>
-              Libros en el catálogo: <strong>{estado.libros}</strong>
-            </p>
-          </>
-        )}
-        {estado.tipo === 'error' && (
-          <>
-            <p className="titulo">No se pudo conectar con la API</p>
-            <p>
-              Comprueba que está en marcha en <code>{API_URL}</code>.
-            </p>
-            <p className="detalle">{estado.detalle}</p>
-          </>
-        )}
-      </section>
-    </main>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Navigate to="/libros" replace />} />
+        <Route path="libros" element={<LibrosPagina />} />
+        <Route path="libros/nuevo" element={<LibroFormPagina />} />
+        <Route path="libros/:id" element={<LibroDetallePagina />} />
+        <Route path="libros/:id/editar" element={<LibroFormPagina edicion />} />
+        <Route path="socios" element={<SociosPagina />} />
+        <Route path="socios/nuevo" element={<SocioFormPagina />} />
+        <Route path="socios/:id" element={<SocioDetallePagina />} />
+        <Route path="socios/:id/editar" element={<SocioFormPagina edicion />} />
+        <Route path="*" element={<NoEncontrada />} />
+      </Route>
+    </Routes>
   )
 }
 

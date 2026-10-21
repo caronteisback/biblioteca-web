@@ -12,14 +12,14 @@ Browser frontend of the library system: the librarian's panel for the catalog, m
 
 ## Status
 
-Early: the skeleton is in place and the first page proves that the browser can reach the API. The screens come next.
+Working so far: the catalog (books and their copies) and the members. Loans and fines come next.
 
 | Step | What | State |
 |------|------|-------|
 | 1 | Project skeleton, CORS, CI | done |
 | 2 | API client with types generated from the contract | done |
-| 3 | Catalog and members | next |
-| 4 | Loans and fines | planned |
+| 3 | Catalog and members | done |
+| 4 | Loans and fines | next |
 | 5 | Tests and polish | planned |
 
 There is no login yet: the API has no authentication, so this panel is for local use only and must not be exposed to a network.
@@ -33,7 +33,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:5173>. If the API is up you will see "API conectada" and the number of books in the catalog; if not, the page says which address it tried.
+Open <http://localhost:5173>. If the API is down, the lists say so and offer a retry.
 
 The API address is `http://localhost:8080` by default. To change it, copy `.env.example` to `.env.local` and edit `VITE_API_URL`.
 
@@ -48,6 +48,19 @@ The API address is `http://localhost:8080` by default. To change it, copy `.env.
 | `npm run api:generate` | Regenerates `src/api/schema.d.ts` from the contract copy |
 | `npm run api:check` | Checks the contract copy and that the generated types are up to date |
 | `npm run preview` | Serves the production build locally |
+
+## What you can do today
+
+| Screen | Address | What it does |
+|--------|---------|--------------|
+| Books | `/libros` | Paginated list with a search on title or author; the search and the page live in the address, so reload and "back" keep them |
+| New and edit book | `/libros/nuevo`, `/libros/:id/editar` | Forms; the API's answer is shown in Spanish, with the field detail when the data is invalid |
+| Book | `/libros/:id` | Details, delete, and its **copies**: add, retire, restore and delete, with the state of each (available, on loan, retired) |
+| Members | `/socios` | Paginated list with a search on name or email |
+| New and edit member | `/socios/nuevo`, `/socios/:id/editar` | Forms |
+| Member | `/socios/:id` | Details, **score** and **alerts** (calculated by the API), deactivate, reactivate and delete |
+
+Every screen goes through the typed client below and shows each failure with the message of its error code.
 
 ## The API client and the contract
 
@@ -79,11 +92,16 @@ CORS covers `/api/**` only, so the frontend calls nothing else.
 contract/     pinned copy of the API contract and its tag
 scripts/      api.mjs: generates and checks the types
 src/
-  api/        schema.d.ts (generated), cliente.ts (typed client), errores.ts (codes and messages)
-  main.tsx    entry point
-  App.tsx     the first page
-  config.ts   API address from VITE_API_URL
+  api/          schema.d.ts (generated), cliente.ts (typed client), errores.ts and alertas.ts (codes and messages), contexto.ts
+  componentes/  pieces shared by the screens: layout, search box, pagination, error notice, forms, copies of a book
+  hooks/        useCargar (loading state), useBusqueda (search and page in the address), useIdDeRuta
+  paginas/      one file per screen
+  pruebas/      test helpers (fake API, in-memory router)
+  App.tsx       the routes
+  config.ts     API address from VITE_API_URL
 ```
+
+Screens receive the API through a React context, so tests give them a fake one and never touch the network.
 
 ## License
 
