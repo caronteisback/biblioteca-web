@@ -25,3 +25,12 @@ jobs:
         run: npm run api:check
       - run: npm test
       - run: npm run build
+
+  image:
+    name: Container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the image
+        run: docker build -t biblioteca-web:ci .

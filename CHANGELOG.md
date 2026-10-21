@@ -2,6 +2,12 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.1.1] - 2026-10-21
+
+### Added
+
+- **Container image:** a multi-stage `Dockerfile` (Node builds, nginx without root serves) with a health check, and an nginx config that forwards `/api` to the API, falls back to the panel for every other address and sends security headers (Content-Security-Policy, `X-Frame-Options`, `nosniff`). CI builds the image on every push.
+
 ## [0.1.0] - 2026-10-21
 
 First complete version of the librarian's panel: catalog, members, loans and fines, written against the API contract v0.1.1.

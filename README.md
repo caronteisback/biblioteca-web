@@ -37,6 +37,16 @@ Open <http://localhost:5173>. If the API is down, the lists say so and offer a r
 
 The API address is `http://localhost:8080` by default. To change it, copy `.env.example` to `.env.local` and edit `VITE_API_URL`.
 
+## Run in a container
+
+The image builds the panel and serves it with nginx (as a user without privileges). nginx also forwards `/api` to the API, so the browser talks to a single address and no CORS is needed. The API is expected at `http://api:8080` on the container's network.
+
+```bash
+docker build -t biblioteca-web .
+```
+
+The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts the panel, the API and the database together in one command, with demo data. The page is sent with a strict Content-Security-Policy (only its own files), `X-Frame-Options: DENY`, `nosniff` and no referrer.
+
 ## Scripts
 
 | Command | What it does |
