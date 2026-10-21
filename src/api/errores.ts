@@ -34,6 +34,10 @@ export const MENSAJES: Record<CodigoError, string> = {
   LOAN_LIMIT_REACHED: 'El socio ya tiene el máximo de préstamos activos.',
   RENEWAL_LIMIT_REACHED: 'El préstamo ya usó todas sus renovaciones.',
   RENEWAL_NOT_ALLOWED_OVERDUE: 'Un préstamo vencido no se puede renovar.',
+  UNAUTHENTICATED: 'Tu sesión caducó o todavía no has entrado. Entra de nuevo.',
+  INVALID_CREDENTIALS: 'El correo o la contraseña no son correctos.',
+  FORBIDDEN: 'Tu rol no permite esta operación.',
+  TOO_MANY_ATTEMPTS: 'Demasiados intentos fallidos con ese correo. Inténtalo de nuevo en unos minutos.',
   INTERNAL_ERROR: 'La API tuvo un fallo interno. Inténtalo de nuevo.',
 }
 

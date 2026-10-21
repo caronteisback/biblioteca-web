@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { crearApi, crearCliente } from './cliente.ts'
+import { avisoDeCierre, iniciarSesion, obtenerSesion, reiniciarSesionParaPruebas } from '../sesion/estado.ts'
 import { ApiError } from './errores.ts'
 
 const json = (cuerpo: unknown, estado = 200) =>
@@ -47,5 +48,71 @@ describe('api.libros.listar', () => {
 
     expect(error).toBeInstanceOf(ApiError)
     expect(error).toMatchObject({ estado: 0, codigo: null })
+  })
+})
+
+describe('the session in the client', () => {
+  const sesion = {
+    token: 'el-token-de-la-sesion',
+    expiraEn: new Date(Date.now() + 3_600_000).toISOString(),
+    usuario: { id: 1, email: 'bibliotecaria@example.org', rol: 'LIBRARIAN' as const, socio: null },
+  }
+  const pagina = { items: [], page: 0, size: 20, totalElements: 0, totalPages: 0 }
+
+  afterEach(() => reiniciarSesionParaPruebas())
+
+  it('sends the token of the session with every call', async () => {
+    iniciarSesion(sesion)
+    const { api, peticiones } = apiCon(() => json(pagina))
+
+    await api.libros.listar()
+
+    expect(peticiones[0].headers.get('Authorization')).toBe('Bearer el-token-de-la-sesion')
+  })
+
+  it('sends no Authorization header when nobody is signed in', async () => {
+    const { api, peticiones } = apiCon(() => json(pagina))
+
+    await api.libros.listar()
+
+    expect(peticiones[0].headers.has('Authorization')).toBe(false)
+  })
+
+  it('never sends the token to the sign-in itself', async () => {
+    iniciarSesion(sesion)
+    const { api, peticiones } = apiCon(() => json({ token: 'otro', tipo: 'Bearer', expiraEn: sesion.expiraEn, usuario: sesion.usuario }))
+
+    await api.auth.entrar('bibliotecaria@example.org', 'una-contrasena-larga')
+
+    expect(peticiones[0].headers.has('Authorization')).toBe(false)
+    expect(JSON.parse(await peticiones[0].text())).toEqual({ email: 'bibliotecaria@example.org', password: 'una-contrasena-larga' })
+  })
+
+  it('ends the session when the API refuses the token, and says so', async () => {
+    iniciarSesion(sesion)
+    const { api } = apiCon(() => json({ code: 'UNAUTHENTICATED', message: 'You must sign in to use this operation.' }, 401))
+
+    await expect(api.libros.listar()).rejects.toMatchObject({ codigo: 'UNAUTHENTICATED', estado: 401 })
+
+    expect(obtenerSesion()).toBeNull()
+    expect(avisoDeCierre()).toBe('Tu sesión ya no es válida. Entra de nuevo.')
+  })
+
+  it('keeps the session when a wrong password is refused at the sign-in', async () => {
+    iniciarSesion(sesion)
+    const { api } = apiCon(() => json({ code: 'INVALID_CREDENTIALS', message: 'The email or the password is not correct.' }, 401))
+
+    await expect(api.auth.entrar('x@example.org', 'mala-contrasena-123')).rejects.toMatchObject({ codigo: 'INVALID_CREDENTIALS' })
+
+    expect(obtenerSesion()).not.toBeNull()
+  })
+
+  it('keeps the session when only the role is refused (403)', async () => {
+    iniciarSesion(sesion)
+    const { api } = apiCon(() => json({ code: 'FORBIDDEN', message: 'Your role is not allowed to use this operation.' }, 403))
+
+    await expect(api.cuenta.misPrestamos()).rejects.toMatchObject({ codigo: 'FORBIDDEN' })
+
+    expect(obtenerSesion()).not.toBeNull()
   })
 })

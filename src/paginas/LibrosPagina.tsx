@@ -7,12 +7,14 @@ import { Paginacion } from '../componentes/Paginacion.tsx'
 import { Titulo } from '../componentes/Titulo.tsx'
 import { useBusqueda } from '../hooks/useBusqueda.ts'
 import { useCargar } from '../hooks/useCargar.ts'
+import { useSesion } from '../sesion/useSesion.ts'
 
 const POR_PAGINA = 10
 
 export function LibrosPagina() {
   const api = useApi()
   const { q, pagina, buscar, irA } = useBusqueda()
+  const { rol } = useSesion()
   const cargar = useCallback(
     () => api.libros.listar({ q: q || undefined, page: pagina, size: POR_PAGINA }),
     [api, q, pagina],
@@ -24,9 +26,11 @@ export function LibrosPagina() {
       <Titulo texto="Libros" />
       <div className="titulo-con-accion">
         <h1>Libros</h1>
-        <Link className="boton" to="/libros/nuevo">
-          Nuevo libro
-        </Link>
+        {rol === 'LIBRARIAN' && (
+          <Link className="boton" to="/libros/nuevo">
+            Nuevo libro
+          </Link>
+        )}
       </div>
       <Buscador valor={q} etiqueta="Título o autor" alBuscar={buscar} />
       <CargaVista carga={carga} reintentar={recargar}>

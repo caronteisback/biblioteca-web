@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { useApi } from '../api/contexto.ts'
 import type { Ejemplar } from '../api/cliente.ts'
 import { useCargar } from '../hooks/useCargar.ts'
+import { useSesion } from '../sesion/useSesion.ts'
 import { estadoDelEjemplar } from '../formato.ts'
 import { AvisoError } from './AvisoError.tsx'
 import { CargaVista } from './CargaVista.tsx'
@@ -12,6 +13,7 @@ const MAXIMO = 100
 /** The copies of one book, with the commands to add, retire, restore and delete them. */
 export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
   const api = useApi()
+  const puedeGestionar = useSesion().rol === 'LIBRARIAN'
   const cargar = useCallback(() => api.ejemplares.listarDeLibro(libroId, { size: MAXIMO }), [api, libroId])
   const [carga, recargar] = useCargar(cargar)
   const [codigo, setCodigo] = useState('')
@@ -57,7 +59,7 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
                     <tr>
                       <th scope="col">Código</th>
                       <th scope="col">Estado</th>
-                      <th scope="col">Acciones</th>
+                      {puedeGestionar && <th scope="col">Acciones</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -69,7 +71,8 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
                             {estadoDelEjemplar(ejemplar)}
                           </span>
                         </td>
-                        <td className="acciones">
+                        {puedeGestionar && (
+                          <td className="acciones">
                           {ejemplar.activo && ejemplar.disponible && (
                             <Link className="boton" to={`/prestamos/nuevo?ejemplarId=${ejemplar.id}`}>
                               Prestar
@@ -88,6 +91,7 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
                             Eliminar
                           </button>
                         </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -99,13 +103,15 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
         )}
       </CargaVista>
       {errorAccion !== null && <AvisoError error={errorAccion} />}
-      <form className="formulario en-linea" onSubmit={agregar}>
+      {puedeGestionar && (
+        <form className="formulario en-linea" onSubmit={agregar}>
         <label>
           Código del nuevo ejemplar
           <input value={codigo} onChange={(e) => setCodigo(e.target.value)} required maxLength={30} />
         </label>
         <button type="submit">Agregar ejemplar</button>
       </form>
+      )}
     </section>
   )
 }

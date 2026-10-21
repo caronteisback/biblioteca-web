@@ -12,7 +12,7 @@ Browser frontend of the library system: the librarian's panel for the catalog, m
 
 ## Status
 
-Working: the catalog (books and their copies), the members, the loans and the fines: the whole life of a loan from the browser. Left: the login, once the API has one.
+Working: signing in with two roles, the catalog (books and their copies), the members, the loans and the fines, and "my account" for members: the whole life of a loan from the browser.
 
 | Step | What | State |
 |------|------|-------|
@@ -21,8 +21,9 @@ Working: the catalog (books and their copies), the members, the loans and the fi
 | 3 | Catalog and members | done |
 | 4 | Loans and fines | done |
 | 5 | Tests and polish | done |
+| 6 | Sign-in and roles (JWT) | done |
 
-There is no login yet: the API has no authentication, so this panel is for local use only and must not be exposed to a network.
+Everything needs a sign-in. The panel never decides what you may do: the API checks the token and the role on every call. Use HTTPS in front of both in any real deployment.
 
 ## Quick start
 
@@ -54,7 +55,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 | `npm run dev` | Development server with hot reload on port 5173 |
 | `npm run build` | Type-checks and builds the production files into `dist/` |
 | `npm run lint` | Lints the code with oxlint |
-| `npm test` | Runs the unit tests with Vitest |
+| `npm test` | Runs the tests with Vitest |
 | `npm run api:generate` | Regenerates `src/api/schema.d.ts` from the contract copy |
 | `npm run api:check` | Checks the contract copy and that the generated types are up to date |
 | `npm run preview` | Serves the production build locally |
@@ -65,7 +66,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 npm test
 ```
 
-69 tests, in four layers:
+143 tests, in four layers:
 
 | Layer | What it proves |
 |-------|----------------|
@@ -85,10 +86,27 @@ Two checks need a real browser and were done in one, not in the tests: colour co
 - Colour follows the system's light or dark mode, with contrast checked in both.
 - A screen that fails while drawing shows a notice instead of a blank page.
 
+## Signing in
+
+Every screen but the sign-in asks for a session. The panel signs in through the API (`POST /api/v1/auth/login`), keeps the token in the **`sessionStorage`** of the tab, and sends it as `Authorization: Bearer` on every call.
+
+| Role | Sees |
+|------|------|
+| **Librarian** | The whole panel: catalog, members, loans and fines |
+| **Member** | The catalog to read (no create, edit, delete or lend buttons) and **Mi cuenta**: their score, alerts, active loans and pending fines. The API gives each member only their own data |
+
+- **A reload keeps the session; closing the tab ends it.** An expired token ends the session by itself, and the sign-in says why.
+- **If the API refuses the token** (a 401 on any call), the session ends and the panel goes back to the sign-in with a notice. A refusal for the role (403) does not end it.
+- **After signing in** you go back to the screen you were heading for, only if your role can see it; a member who asked for a librarian screen lands in their account instead of on a refusal.
+- **Why `sessionStorage`:** it survives a reload and is cleared when the tab closes. A script on the page could read it, which is why the page is served with a strict Content-Security-Policy and loads nothing from other sites. The alternatives were keeping the token only in memory (safer, but a reload signs you out) or an `HttpOnly` cookie (not readable by scripts, but it needs CSRF protection and a different way for the API to read the credential).
+- **Signing out** forgets the token. It cannot revoke it: the API's tokens last 60 minutes and are not revoked early.
+
 ## What you can do today
 
 | Screen | Address | What it does |
 |--------|---------|--------------|
+| Sign in | `/login` | Email and password; says in Spanish why a sign-in failed (wrong credentials, too many attempts) |
+| My account | `/cuenta` | Members only: their data, score, alerts, active loans and pending fines |
 | Books | `/libros` | Paginated list with a search on title or author; the search and the page live in the address, so reload and "back" keep them |
 | New and edit book | `/libros/nuevo`, `/libros/:id/editar` | Forms; the API's answer is shown in Spanish, with the field detail when the data is invalid |
 | Book | `/libros/:id` | Details, delete, and its **copies**: add, retire, restore and delete, with the state of each (available, on loan, retired) |
@@ -132,7 +150,8 @@ CORS covers `/api/**` only, so the frontend calls nothing else.
 contract/     pinned copy of the API contract and its tag
 scripts/      api.mjs: generates and checks the types
 src/
-  api/          schema.d.ts (generated), cliente.ts (typed client), errores.ts and alertas.ts (codes and messages), contexto.ts
+  api/          schema.d.ts (generated), cliente.ts (typed client and session middleware), errores.ts and alertas.ts (codes and messages), contexto.ts
+  sesion/       estado.ts (the session of the tab), useSesion.ts, inicio.ts (where each role starts)
   componentes/  pieces shared by the screens: layout, search box, pagination, error notice, forms, copies of a book
   hooks/        useCargar (loading state), useBusqueda (search and page in the address), useIdDeRuta
   paginas/      one file per screen

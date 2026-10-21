@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+import { cerrarSesion } from '../sesion/estado.ts'
+import { useSesion } from '../sesion/useSesion.ts'
 import { LimiteDeError } from './LimiteDeError.tsx'
 
 export function Layout() {
   const { pathname } = useLocation()
+  const navegar = useNavigate()
+  const { sesion, rol } = useSesion()
   const principal = useRef<HTMLElement>(null)
   const primeraVez = useRef(true)
 
@@ -17,6 +21,11 @@ export function Layout() {
     principal.current?.focus()
   }, [pathname])
 
+  function salir() {
+    cerrarSesion()
+    navegar('/login', { replace: true })
+  }
+
   return (
     <>
       <a className="salto" href="#contenido">
@@ -26,10 +35,23 @@ export function Layout() {
         <strong className="marca">Biblioteca</strong>
         <nav aria-label="Principal">
           <NavLink to="/libros">Libros</NavLink>
-          <NavLink to="/socios">Socios</NavLink>
-          <NavLink to="/prestamos">Préstamos</NavLink>
-          <NavLink to="/multas">Multas</NavLink>
+          {rol === 'LIBRARIAN' && (
+            <>
+              <NavLink to="/socios">Socios</NavLink>
+              <NavLink to="/prestamos">Préstamos</NavLink>
+              <NavLink to="/multas">Multas</NavLink>
+            </>
+          )}
+          {rol === 'MEMBER' && <NavLink to="/cuenta">Mi cuenta</NavLink>}
         </nav>
+        {sesion && (
+          <div className="usuario">
+            <span title={sesion.usuario.rol === 'LIBRARIAN' ? 'Bibliotecario' : 'Socio'}>{sesion.usuario.email}</span>
+            <button type="button" onClick={salir}>
+              Salir
+            </button>
+          </div>
+        )}
       </header>
       <main id="contenido" tabIndex={-1} ref={principal}>
         <LimiteDeError key={pathname}>

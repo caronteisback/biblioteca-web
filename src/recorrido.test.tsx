@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.tsx'
 import { MENSAJES } from './api/errores.ts'
-import { crearApiEnMemoria } from './pruebas/apiEnMemoria.ts'
+import { BIBLIOTECARIA, crearApiEnMemoria } from './pruebas/apiEnMemoria.ts'
 import { renderizar } from './pruebas/renderizar.ts'
 
 afterEach(() => vi.restoreAllMocks())
@@ -27,7 +27,12 @@ async function elegirSocioYEjemplar(socio: string, libro: string, codigo: string
 describe('the life of a loan through the whole application', () => {
   it('registers a book, a copy and a member, lends, refuses a late renewal, fines the return and takes the payment', async () => {
     const memoria = crearApiEnMemoria()
-    renderizar(<App />, { api: memoria.api, ruta: '/' })
+    renderizar(<App />, { api: memoria.api, ruta: '/', sesion: null })
+
+    // Nobody is signed in: the panel asks for the credentials of the librarian, who lands in the catalog.
+    await escribir('Correo', BIBLIOTECARIA.email)
+    await escribir('Contraseña', BIBLIOTECARIA.password)
+    await pulsar('Entrar')
 
     // The catalog starts empty and gets a book with a copy.
     expect(await screen.findByText('Todavía no hay libros en el catálogo.')).toBeTruthy()
@@ -88,5 +93,39 @@ describe('the life of a loan through the whole application', () => {
     const fila = (await screen.findByText('S/ 5.00')).closest('tr') as HTMLElement
     await userEvent.click(within(fila).getByRole('button', { name: 'Pagar' }))
     expect(await screen.findByText('Pagada el 21/10/2026')).toBeTruthy()
+
+    // Signing out ends the session: the panel asks again for the credentials.
+    await pulsar('Salir')
+    expect(await screen.findByLabelText('Correo')).toBeTruthy()
+  })
+
+  it('lets a member sign in, see the catalog and their own account, and nothing of anyone else', async () => {
+    const memoria = crearApiEnMemoria()
+    const libro = await memoria.api.libros.crear({ isbn: '9780306406157', titulo: 'El Faro Imaginado', autor: 'Autora Ficticia' })
+    const ejemplar = await memoria.api.ejemplares.crear(libro.id, 'EJ-1')
+    const rosa = await memoria.api.socios.crear({ nombre: 'Rosa Ficticia', email: 'rosa@example.org' })
+    const mateo = await memoria.api.socios.crear({ nombre: 'Mateo Quispe', email: 'mateo@example.org' })
+    memoria.abrirCuenta(rosa.id, 'rosa@example.org', 'una-contrasena-larga')
+    await memoria.api.prestamos.crear(rosa.id, ejemplar.id)
+    const otro = await memoria.api.ejemplares.crear(libro.id, 'EJ-2')
+    await memoria.api.prestamos.crear(mateo.id, otro.id)
+    memoria.envejecerPrestamos(19)
+    renderizar(<App />, { api: memoria.api, ruta: '/socios', sesion: null })
+
+    // The member asked for a librarian screen before signing in; after it, they land in their own account, not on a refusal.
+    await escribir('Correo', 'rosa@example.org')
+    await escribir('Contraseña', 'una-contrasena-larga')
+    await pulsar('Entrar')
+    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+
+    // Their own account shows their loan, overdue, and only theirs.
+    expect(await screen.findByText('Vencido (5 d)')).toBeTruthy()
+    expect(screen.getAllByText(/Préstamo #/)).toHaveLength(1)
+    expect(screen.queryByText('Mateo Quispe')).toBeNull()
+
+    // The catalog is there to read.
+    await ir(/^Libros$/)
+    expect(await screen.findByRole('link', { name: 'El Faro Imaginado' })).toBeTruthy()
+    expect(screen.queryByRole('link', { name: 'Nuevo libro' })).toBeNull()
   })
 })

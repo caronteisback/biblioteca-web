@@ -30,6 +30,11 @@ describe('titles', () => {
     await waitFor(() => expect(document.title).toBe(titulo))
   })
 
+  it('the sign-in has its own title', async () => {
+    renderizar(<App />, { api: crearApiEnMemoria().api, ruta: '/login', sesion: null })
+    await waitFor(() => expect(document.title).toBe('Entrar · Biblioteca'))
+  })
+
   it('a book and a member are titled with their own name', async () => {
     const { api } = crearApiEnMemoria()
     const libro = await api.libros.crear({ isbn: '9780306406157', titulo: 'El Faro Imaginado', autor: 'Autora Ficticia' })

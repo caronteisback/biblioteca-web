@@ -4,7 +4,7 @@ import axe from 'axe-core'
 import { describe, expect, it } from 'vitest'
 import App from './App.tsx'
 import { crearApiEnMemoria } from './pruebas/apiEnMemoria.ts'
-import { renderizar } from './pruebas/renderizar.ts'
+import { renderizar, sesionDe } from './pruebas/renderizar.ts'
 
 /** A library with one of everything, so every screen has something to show. */
 async function biblioteca() {
@@ -14,6 +14,7 @@ async function biblioteca() {
   const ejemplar = await api.ejemplares.crear(libro.id, 'EJ-1')
   await api.ejemplares.crear(libro.id, 'EJ-2')
   const socio = await api.socios.crear({ nombre: 'Rosa Ficticia', email: 'rosa@example.org' })
+  memoria.abrirCuenta(socio.id, 'rosa@example.org', 'una-contrasena-larga')
   const prestamo = await api.prestamos.crear(socio.id, ejemplar.id)
   memoria.envejecerPrestamos(19)
   await api.prestamos.devolver(prestamo.id)
@@ -48,6 +49,24 @@ describe('accessibility of every screen (axe)', () => {
   ] as const)('%s has no violations', async (_nombre, ruta, esperado) => {
     const datos = await biblioteca()
     renderizar(<App />, { api: datos.memoria.api, ruta: ruta(datos) })
+
+    await waitFor(() => expect(screen.getAllByText(esperado).length).toBeGreaterThan(0))
+
+    expect(await violaciones()).toEqual([])
+  })
+})
+
+describe('accessibility of the sign-in and of what a member sees (axe)', () => {
+  it.each([
+    ['the sign-in', '/login', null, 'Entrar'],
+    ['my account', '/cuenta', 'MEMBER', 'Mis préstamos activos'],
+    ['the refusal a member gets for a librarian screen', '/socios', 'MEMBER', 'Sin permiso'],
+    ['the catalog, read by a member', '/libros', 'MEMBER', 'El Faro Imaginado'],
+    ['a book with its copies, read by a member', '/libros/1', 'MEMBER', 'EJ-2'],
+  ] as const)('%s has no violations', async (_nombre, ruta, rol, esperado) => {
+    const datos = await biblioteca()
+    const rutaFinal = ruta === '/libros/1' ? `/libros/${datos.libro.id}` : ruta
+    renderizar(<App />, { api: datos.memoria.api, ruta: rutaFinal, sesion: rol ? sesionDe(rol, 'rosa@example.org') : null })
 
     await waitFor(() => expect(screen.getAllByText(esperado).length).toBeGreaterThan(0))
 

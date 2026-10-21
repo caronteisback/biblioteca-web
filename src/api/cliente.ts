@@ -1,5 +1,6 @@
 import createClient from 'openapi-fetch'
 import { API_URL } from '../config.ts'
+import { cerrarSesion, obtenerSesion } from '../sesion/estado.ts'
 import { ApiError, errorDeRespuesta } from './errores.ts'
 import type { components, paths } from './schema.d.ts'
 
@@ -10,6 +11,8 @@ export type Socio = components['schemas']['SocioResponse']
 export type SocioResumen = components['schemas']['SocioResumen']
 export type SocioPedido = components['schemas']['SocioRequest']
 export type Alerta = components['schemas']['Alerta']
+export type Usuario = components['schemas']['UsuarioResponse']
+export type Rol = Usuario['rol']
 export type Prestamo = components['schemas']['PrestamoResponse']
 export type Multa = components['schemas']['MultaResponse']
 export type EstadoMulta = Multa['estado']
@@ -36,7 +39,21 @@ type Resultado<T> = { data?: T; error?: unknown; response: Response }
  * describe does not compile. `fetchImpl` exists so tests can answer without a network.
  */
 export function crearCliente(baseUrl: string = API_URL, fetchImpl: typeof fetch = (...args) => fetch(...args)) {
-  return createClient<paths>({ baseUrl, fetch: fetchImpl })
+  const cliente = createClient<paths>({ baseUrl, fetch: fetchImpl })
+  const ENTRAR = '/api/v1/auth/login'
+  cliente.use({
+    /** Every call but the sign-in carries the token of the session, if there is one. */
+    onRequest({ request, schemaPath }) {
+      const sesion = obtenerSesion()
+      if (sesion && schemaPath !== ENTRAR) request.headers.set('Authorization', `Bearer ${sesion.token}`)
+      return request
+    },
+    /** A 401 on a call that carried a token means the token is not good any more: the session ends and the screen asks to sign in. */
+    onResponse({ response, schemaPath }) {
+      if (response.status === 401 && schemaPath !== ENTRAR && obtenerSesion()) cerrarSesion('rechazada')
+    },
+  })
+  return cliente
 }
 
 /**
@@ -72,6 +89,16 @@ export async function resolverVacio(llamada: Promise<Resultado<unknown>>): Promi
 /** The operations the screens use, as plain functions that return the data or throw an ApiError. */
 export function crearApi(cliente = crearCliente()) {
   return {
+    auth: {
+      entrar: (email: string, password: string) => resolver(cliente.POST('/api/v1/auth/login', { body: { email, password } })),
+    },
+    cuenta: {
+      yo: () => resolver(cliente.GET('/api/v1/me')),
+      misPrestamos: (consulta: Omit<Consulta, 'q'> & { activo?: boolean } = {}) =>
+        resolver(cliente.GET('/api/v1/me/prestamos', { params: { query: consulta } })),
+      misMultas: (consulta: Omit<Consulta, 'q'> & { estado?: EstadoMulta } = {}) =>
+        resolver(cliente.GET('/api/v1/me/multas', { params: { query: consulta } })),
+    },
     libros: {
       listar: (consulta: Consulta = {}) => resolver(cliente.GET('/api/v1/libros', { params: { query: consulta } })),
       obtener: (id: number) => resolver(cliente.GET('/api/v1/libros/{id}', { params: { path: { id } } })),

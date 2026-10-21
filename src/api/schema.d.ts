@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign in
+         * @description Exchanges an email and a password for a bearer token valid for 60 minutes. After 5 failed attempts in a row for the same email, further attempts are refused for 5 minutes (`TOO_MANY_ATTEMPTS`). The answer never says whether the email exists: a wrong email and a wrong password look the same (`INVALID_CREDENTIALS`).
+         */
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ejemplares/{id}": {
         parameters: {
             query?: never;
@@ -126,6 +146,66 @@ export interface paths {
         put?: never;
         /** Add a copy to a book */
         post: operations["createCopy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the signed-in user
+         * @description The signed-in user. For a member it carries the member data, with the score and the alerts calculated now.
+         */
+        get: operations["getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/multas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List my fines
+         * @description Only the fines of the signed-in member, paginated and ordered by id. A librarian has no fines of their own.
+         */
+        get: operations["listMyFines"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/prestamos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List my loans
+         * @description Only the loans of the signed-in member, paginated and ordered by id. A librarian has no loans of their own.
+         */
+        get: operations["listMyLoans"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -387,7 +467,7 @@ export interface components {
              * @description Stable error code. ENDPOINT_NOT_FOUND and METHOD_NOT_ALLOWED can answer any URL, so no operation lists them.
              * @enum {string}
              */
-            code: "VALIDATION_ERROR" | "BOOK_NOT_FOUND" | "COPY_NOT_FOUND" | "MEMBER_NOT_FOUND" | "LOAN_NOT_FOUND" | "FINE_NOT_FOUND" | "ENDPOINT_NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "COPY_ALREADY_ON_LOAN" | "LOAN_ALREADY_RETURNED" | "FINE_ALREADY_PAID" | "DUPLICATE_ISBN" | "DUPLICATE_EMAIL" | "DUPLICATE_COPY_CODE" | "BOOK_HAS_COPIES" | "COPY_HAS_HISTORY" | "COPY_HAS_ACTIVE_LOAN" | "MEMBER_HAS_HISTORY" | "MEMBER_HAS_ACTIVE_LOANS" | "CONCURRENT_UPDATE" | "MEMBER_INACTIVE" | "COPY_INACTIVE" | "MEMBER_HAS_OVERDUE_LOAN" | "MEMBER_HAS_PENDING_FINE" | "MEMBER_BLOCKED_BY_SCORE" | "LOAN_LIMIT_REACHED" | "RENEWAL_LIMIT_REACHED" | "RENEWAL_NOT_ALLOWED_OVERDUE" | "INTERNAL_ERROR";
+            code: "VALIDATION_ERROR" | "BOOK_NOT_FOUND" | "COPY_NOT_FOUND" | "MEMBER_NOT_FOUND" | "LOAN_NOT_FOUND" | "FINE_NOT_FOUND" | "ENDPOINT_NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "COPY_ALREADY_ON_LOAN" | "LOAN_ALREADY_RETURNED" | "FINE_ALREADY_PAID" | "DUPLICATE_ISBN" | "DUPLICATE_EMAIL" | "DUPLICATE_COPY_CODE" | "BOOK_HAS_COPIES" | "COPY_HAS_HISTORY" | "COPY_HAS_ACTIVE_LOAN" | "MEMBER_HAS_HISTORY" | "MEMBER_HAS_ACTIVE_LOANS" | "CONCURRENT_UPDATE" | "MEMBER_INACTIVE" | "COPY_INACTIVE" | "MEMBER_HAS_OVERDUE_LOAN" | "MEMBER_HAS_PENDING_FINE" | "MEMBER_BLOCKED_BY_SCORE" | "LOAN_LIMIT_REACHED" | "RENEWAL_LIMIT_REACHED" | "RENEWAL_NOT_ALLOWED_OVERDUE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "INVALID_CREDENTIALS" | "TOO_MANY_ATTEMPTS";
             message: string;
         };
         LibroRequest: {
@@ -412,6 +492,23 @@ export interface components {
              */
             isbn: string;
             titulo: string;
+        };
+        LoginRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        LoginResponse: {
+            /**
+             * Format: date-time
+             * @description The moment the token stops being valid.
+             */
+            expiraEn: string;
+            /** @enum {string} */
+            tipo: "Bearer";
+            /** @description Send it as `Authorization: Bearer <token>`. */
+            token: string;
+            usuario: components["schemas"]["UsuarioResponse"];
         };
         MultaResponse: {
             /**
@@ -574,6 +671,16 @@ export interface components {
             id: number;
             nombre: string;
         };
+        UsuarioResponse: {
+            /** Format: email */
+            email: string;
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            rol: "LIBRARIAN" | "MEMBER";
+            /** @description The member data, with score and alerts, when the role is MEMBER; null for a librarian. */
+            socio?: components["schemas"]["SocioResponse"] | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -583,6 +690,75 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `VALIDATION_ERROR`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INVALID_CREDENTIALS`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNSUPPORTED_MEDIA_TYPE`. */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `TOO_MANY_ATTEMPTS`. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INTERNAL_ERROR`. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getCopy: {
         parameters: {
             query?: never;
@@ -605,6 +781,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -652,6 +846,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -717,6 +929,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `COPY_NOT_FOUND`. */
             404: {
                 headers: {
@@ -768,6 +998,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -838,6 +1086,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `INTERNAL_ERROR`. */
             500: {
                 headers: {
@@ -875,6 +1132,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -940,6 +1215,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `BOOK_NOT_FOUND`. */
             404: {
                 headers: {
@@ -986,6 +1270,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1058,6 +1360,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `BOOK_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1121,6 +1441,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `BOOK_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1176,6 +1505,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `BOOK_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1196,6 +1543,170 @@ export interface operations {
             };
             /** @description Error. Possible codes: `UNSUPPORTED_MEDIA_TYPE`. */
             415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INTERNAL_ERROR`. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INTERNAL_ERROR`. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listMyFines: {
+        parameters: {
+            query?: {
+                /** @description Only the fines in this status. */
+                estado?: "PENDING" | "PAID";
+                /** @description Page number, starting at 0. */
+                page?: number;
+                /** @description Page size, from 1 to 100. */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginaDtoMultaResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `VALIDATION_ERROR`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INTERNAL_ERROR`. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listMyLoans: {
+        parameters: {
+            query?: {
+                /** @description `true` lists the loans not yet returned, `false` the returned ones; leave it out for all. */
+                activo?: boolean;
+                /** @description Page number, starting at 0. */
+                page?: number;
+                /** @description Page size, from 1 to 100. */
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginaDtoPrestamoResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `VALIDATION_ERROR`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1250,6 +1761,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `INTERNAL_ERROR`. */
             500: {
                 headers: {
@@ -1283,6 +1812,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1332,6 +1879,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1404,6 +1969,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `INTERNAL_ERROR`. */
             500: {
                 headers: {
@@ -1441,6 +2024,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1524,6 +2125,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `LOAN_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1566,6 +2185,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1624,6 +2261,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1703,6 +2358,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `INTERNAL_ERROR`. */
             500: {
                 headers: {
@@ -1740,6 +2413,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1805,6 +2496,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `MEMBER_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1851,6 +2560,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1923,6 +2650,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `MEMBER_NOT_FOUND`. */
             404: {
                 headers: {
@@ -1981,6 +2726,24 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Error. Possible codes: `MEMBER_NOT_FOUND`. */
             404: {
                 headers: {
@@ -2032,6 +2795,24 @@ export interface operations {
             };
             /** @description Error. Possible codes: `VALIDATION_ERROR`. */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -2,6 +2,22 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.0] - 2026-10-21
+
+**Breaking:** the panel needs the API 0.3.0 (contract v0.2.1): every operation now asks for a token.
+
+### Added
+
+- **Sign-in.** A login screen; the token is kept in the `sessionStorage` of the tab and sent as `Authorization: Bearer` by the typed client, which never sends it to the sign-in itself. A 401 on any other call ends the session and returns to the sign-in with a notice; an expired token ends it by itself.
+- **Two roles.** Librarians see the whole panel; members see the catalog to read and **Mi cuenta** (their data, score, alerts, active loans and pending fines). Screens a role cannot use show "Sin permiso" and are not offered in the menu; after signing in you return to the screen you asked for only if your role can see it.
+- **Read-only catalog for members:** no create, edit, delete, lend or retire controls.
+- **Messages in Spanish** for the new error codes (`UNAUTHENTICATED`, `INVALID_CREDENTIALS`, `FORBIDDEN`, `TOO_MANY_ATTEMPTS`); the build fails if the contract adds a code without one.
+- A "Salir" button and the signed-in email in the header.
+
+### Tests
+
+- 143 in total. New: the session store (storage that is broken, expired or malformed, the timer, the subscriptions), the client middleware (token sent, never to the sign-in, 401 ends the session, 403 does not), the sign-in screen, access by role for every route, "Mi cuenta", the read-only catalog, and a journey for a member. The whole-journey test now starts at the sign-in. axe finds no violations on the new screens, which were also checked in a real browser against the real API.
+
 ## [0.1.1] - 2026-10-21
 
 ### Added

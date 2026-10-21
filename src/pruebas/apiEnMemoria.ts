@@ -1,5 +1,9 @@
-import type { Alerta, Api, Ejemplar, Libro, Multa, Pagina, Prestamo, Socio } from '../api/cliente.ts'
+import type { Alerta, Api, Ejemplar, Libro, Multa, Pagina, Prestamo, Rol, Socio, Usuario } from '../api/cliente.ts'
 import { ApiError } from '../api/errores.ts'
+import { obtenerSesion } from '../sesion/estado.ts'
+
+/** The librarian that every in-memory library starts with. */
+export const BIBLIOTECARIA = { email: 'bibliotecaria@example.org', password: 'una-contrasena-larga' }
 
 const HOY = '2026-10-21'
 const DIAS_DE_PRESTAMO = 14
@@ -26,6 +30,9 @@ const contiene = (texto: string, q?: string) => !q || texto.toLowerCase().includ
  * renewed, a late return creates a fine. It is for tests of whole journeys through the screens; the
  * real rules are the API's and are tested there. `envejecerPrestamos` moves the loans back in time,
  * since the clock of the API is not ours.
+ *
+ * It also has accounts: a librarian from the start and, with `abrirCuenta`, one account per member. Signing in
+ * returns a session as the API would, and the account operations answer for whoever the session says.
  */
 export function crearApiEnMemoria() {
   let siguiente = 1
@@ -61,7 +68,56 @@ export function crearApiEnMemoria() {
     }
   }
 
+
+  const cuentas = new Map<string, { password: string; rol: Rol; socioId: number | null; id: number }>([
+    [BIBLIOTECARIA.email, { password: BIBLIOTECARIA.password, rol: 'LIBRARIAN', socioId: null, id: nuevoId() }],
+  ])
+  const usuarioDe = (email: string): Usuario => {
+    const cuenta = cuentas.get(email)
+    if (!cuenta) throw new ApiError(401, 'UNAUTHENTICATED', null)
+    const socio = cuenta.socioId === null ? null : vistaSocio(buscar(socios, cuenta.socioId, 'MEMBER_NOT_FOUND'))
+    return { id: cuenta.id, email, rol: cuenta.rol, socio }
+  }
+  const socioDeLaSesion = (): number => {
+    const sesion = obtenerSesion()
+    if (!sesion) throw new ApiError(401, 'UNAUTHENTICATED', null)
+    const cuenta = cuentas.get(sesion.usuario.email)
+    if (!cuenta || cuenta.rol !== 'MEMBER' || cuenta.socioId === null) throw new ApiError(403, 'FORBIDDEN', null)
+    return cuenta.socioId
+  }
+
   const api = {
+    auth: {
+      entrar: async (email: string, password: string) => {
+        const cuenta = cuentas.get(email.toLowerCase())
+        if (!cuenta || cuenta.password !== password) throw new ApiError(401, 'INVALID_CREDENTIALS', null)
+        return {
+          token: `token-de-${email.toLowerCase()}`,
+          tipo: 'Bearer' as const,
+          expiraEn: new Date(Date.now() + 3_600_000).toISOString(),
+          usuario: usuarioDe(email.toLowerCase()),
+        }
+      },
+    },
+    cuenta: {
+      yo: async () => {
+        const sesion = obtenerSesion()
+        if (!sesion) throw new ApiError(401, 'UNAUTHENTICATED', null)
+        return usuarioDe(sesion.usuario.email)
+      },
+      misPrestamos: async ({ activo, page = 0, size = 20 }: { activo?: boolean; page?: number; size?: number } = {}) => {
+        const socioId = socioDeLaSesion()
+        return pagina(prestamos.filter((p) => p.socioId === socioId && (activo === undefined || p.activo === activo)).map(vista), page, size)
+      },
+      misMultas: async ({ estado, page = 0, size = 20 }: { estado?: Multa['estado']; page?: number; size?: number } = {}) => {
+        const socioId = socioDeLaSesion()
+        return pagina(
+          multas.filter((m) => (estado === undefined || m.estado === estado) && prestamos.find((p) => p.id === m.prestamoId)?.socioId === socioId),
+          page,
+          size,
+        )
+      },
+    },
     libros: {
       listar: async ({ q, page = 0, size = 20 }: { q?: string; page?: number; size?: number } = {}) =>
         pagina(libros.filter((l) => contiene(`${l.titulo} ${l.autor}`, q)), page, size),
@@ -201,6 +257,11 @@ export function crearApiEnMemoria() {
 
   return {
     api: api as unknown as Api,
+    /** Gives a member an account to sign in with. */
+    abrirCuenta(socioId: number, email: string, password: string) {
+      buscar(socios, socioId, 'MEMBER_NOT_FOUND')
+      cuentas.set(email.toLowerCase(), { password, rol: 'MEMBER', socioId, id: nuevoId() })
+    },
     /** Moves every active loan back in time, as if that many days had passed since it was made. */
     envejecerPrestamos(dias: number) {
       for (const prestamo of prestamos.filter((p) => p.activo)) {

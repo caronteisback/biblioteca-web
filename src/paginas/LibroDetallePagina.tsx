@@ -8,6 +8,7 @@ import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
 import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
+import { useSesion } from '../sesion/useSesion.ts'
 
 export function LibroDetallePagina() {
   const id = useIdDeRuta()
@@ -17,6 +18,7 @@ export function LibroDetallePagina() {
 function LibroDetalle({ id }: { id: number }) {
   const api = useApi()
   const navegar = useNavigate()
+  const { rol } = useSesion()
   const cargar = useCallback(() => api.libros.obtener(id), [api, id])
   const [carga, recargar] = useCargar(cargar)
   const [errorAccion, setErrorAccion] = useState<unknown>(null)
@@ -50,14 +52,16 @@ function LibroDetalle({ id }: { id: number }) {
               <dt>Año de publicación</dt>
               <dd>{libro.anioPublicacion ?? 'No consta'}</dd>
             </dl>
-            <div className="acciones">
-              <Link className="boton" to={`/libros/${libro.id}/editar`}>
-                Editar
-              </Link>
-              <button type="button" className="peligro" onClick={() => void eliminar()}>
-                Eliminar libro
-              </button>
-            </div>
+            {rol === 'LIBRARIAN' && (
+              <div className="acciones">
+                <Link className="boton" to={`/libros/${libro.id}/editar`}>
+                  Editar
+                </Link>
+                <button type="button" className="peligro" onClick={() => void eliminar()}>
+                  Eliminar libro
+                </button>
+              </div>
+            )}
             {errorAccion !== null && <AvisoError error={errorAccion} />}
             <EjemplaresDelLibro libroId={libro.id} />
           </>

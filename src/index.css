@@ -379,3 +379,18 @@ select {
 main:focus {
   outline: none;
 }
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  color: var(--suave);
+  font-size: 0.9rem;
+}
+
+.acceso {
+  max-width: 24rem;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+}
