@@ -66,7 +66,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 npm test
 ```
 
-143 tests, in four layers:
+144 tests, in four layers:
 
 | Layer | What it proves |
 |-------|----------------|
@@ -97,7 +97,7 @@ Every screen but the sign-in asks for a session. The panel signs in through the 
 
 - **A reload keeps the session; closing the tab ends it.** An expired token ends the session by itself, and the sign-in says why.
 - **If the API refuses the token** (a 401 on any call), the session ends and the panel goes back to the sign-in with a notice. A refusal for the role (403) does not end it.
-- **After signing in** you go back to the screen you were heading for, only if your role can see it; a member who asked for a librarian screen lands in their account instead of on a refusal.
+- **After signing in** you go back to the screen you were heading for, only if your role can see it; a member who asked for a librarian screen lands in their account instead of on a refusal. After signing out on purpose nothing is remembered: the next person starts at their own home.
 - **Why `sessionStorage`:** it survives a reload and is cleared when the tab closes. A script on the page could read it, which is why the page is served with a strict Content-Security-Policy and loads nothing from other sites. The alternatives were keeping the token only in memory (safer, but a reload signs you out) or an `HttpOnly` cookie (not readable by scripts, but it needs CSRF protection and a different way for the API to read the credential).
 - **Signing out** forgets the token. It cannot revoke it: the API's tokens last 60 minutes and are not revoked early.
 

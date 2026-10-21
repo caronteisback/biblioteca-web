@@ -2,6 +2,12 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.2] - 2026-10-21
+
+### Fixed
+
+- After signing out on purpose, the next person to sign in landed on the screen the previous one was on (for example `/libros`) instead of their own home, because the protected route remembered that screen when the session ended. A sign-out on purpose now leaves nothing to go back to. Found by signing out and in again as another user against the real API.
+
 ## [0.2.1] - 2026-10-21
 
 ### Fixed
@@ -23,7 +29,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Tests
 
-- 143 in total. New: the session store (storage that is broken, expired or malformed, the timer, the subscriptions), the client middleware (token sent, never to the sign-in, 401 ends the session, 403 does not), the sign-in screen, access by role for every route, "Mi cuenta", the read-only catalog, and a journey for a member. The whole-journey test now starts at the sign-in. axe finds no violations on the new screens, which were also checked in a real browser against the real API.
+- 143 in total (144 from 0.2.2). New: the session store (storage that is broken, expired or malformed, the timer, the subscriptions), the client middleware (token sent, never to the sign-in, 401 ends the session, 403 does not), the sign-in screen, access by role for every route, "Mi cuenta", the read-only catalog, and a journey for a member. The whole-journey test now starts at the sign-in. axe finds no violations on the new screens, which were also checked in a real browser against the real API.
 
 ## [0.1.1] - 2026-10-21
 

@@ -21,6 +21,7 @@ const oyentes = new Set<() => void>()
 let temporizador: ReturnType<typeof setTimeout> | undefined
 let actual: Sesion | null = null
 let aviso: string | null = null
+let salidaVoluntaria = false
 
 function esSesion(valor: unknown): valor is Sesion {
   if (typeof valor !== 'object' || valor === null) return false
@@ -75,9 +76,15 @@ export function avisoDeCierre(): string | null {
   return aviso
 }
 
+/** True after the user chose to sign out: nobody should be sent back to the screen they were on when the next person signs in. */
+export function huboSalidaVoluntaria(): boolean {
+  return salidaVoluntaria
+}
+
 export function iniciarSesion(sesion: Sesion) {
   actual = sesion
   aviso = null
+  salidaVoluntaria = false
   try {
     sessionStorage.setItem(CLAVE, JSON.stringify(sesion))
   } catch {
@@ -90,6 +97,7 @@ export function iniciarSesion(sesion: Sesion) {
 export function cerrarSesion(motivo?: MotivoDeCierre) {
   actual = null
   aviso = motivo ? MENSAJES[motivo] : null
+  salidaVoluntaria = motivo === undefined
   try {
     sessionStorage.removeItem(CLAVE)
   } catch {
@@ -107,6 +115,7 @@ export function suscribir(oyente: () => void): () => void {
 /** Tests start from nothing; so does a page that was just opened. */
 export function reiniciarSesionParaPruebas() {
   cerrarSesion()
+  salidaVoluntaria = false
 }
 
 /** Reads the storage again, as a page that was just reloaded would. Only tests need it. */

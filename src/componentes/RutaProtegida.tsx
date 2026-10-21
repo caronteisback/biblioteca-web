@@ -12,11 +12,12 @@ import { SinPermiso } from './SinPermiso.tsx'
  * This hides screens, it does not protect data: the API checks the token and the role on every call.
  */
 export function RutaProtegida({ roles, children }: { roles?: readonly Rol[]; children: ReactNode }) {
-  const { sesion } = useSesion()
+  const { sesion, salioAProposito } = useSesion()
   const ubicacion = useLocation()
 
   if (!sesion) {
-    return <Navigate to="/login" replace state={{ desde: ubicacion.pathname + ubicacion.search }} />
+    // After signing out on purpose nothing is remembered: the next person to sign in starts at their own home.
+    return <Navigate to="/login" replace state={salioAProposito ? undefined : { desde: ubicacion.pathname + ubicacion.search }} />
   }
   if (roles && !roles.includes(sesion.usuario.rol)) {
     return <SinPermiso />

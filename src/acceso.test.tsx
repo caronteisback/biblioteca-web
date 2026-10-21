@@ -102,6 +102,18 @@ describe('who sees what', () => {
     expect(screen.queryByRole('status')).toBeNull()
   })
 
+  it('does not send the next person who signs in to the screen the previous one was on', async () => {
+    const { api } = await biblioteca()
+    renderizar(<App />, { api, ruta: '/libros' })
+    await userEvent.click(await screen.findByRole('button', { name: 'Salir' }))
+
+    await userEvent.type(await screen.findByLabelText('Correo'), 'rosa@example.org')
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'una-contrasena-larga')
+    await userEvent.click(screen.getByRole('button', { name: 'Entrar' }))
+
+    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+  })
+
   it('returns to the sign-in, saying why, when the session ends by itself', async () => {
     const { api } = await biblioteca()
     renderizar(<App />, { api, ruta: '/libros' })
