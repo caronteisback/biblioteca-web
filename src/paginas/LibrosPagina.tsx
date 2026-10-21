@@ -4,6 +4,7 @@ import { useApi } from '../api/contexto.ts'
 import { Buscador } from '../componentes/Buscador.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { Paginacion } from '../componentes/Paginacion.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useBusqueda } from '../hooks/useBusqueda.ts'
 import { useCargar } from '../hooks/useCargar.ts'
 
@@ -20,6 +21,7 @@ export function LibrosPagina() {
 
   return (
     <section>
+      <Titulo texto="Libros" />
       <div className="titulo-con-accion">
         <h1>Libros</h1>
         <Link className="boton" to="/libros/nuevo">

@@ -5,6 +5,7 @@ import type { SocioPedido } from '../api/cliente.ts'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
 import { SocioForm } from '../componentes/SocioForm.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
 
@@ -28,6 +29,7 @@ export function SocioFormPagina({ edicion = false }: { edicion?: boolean }) {
 
   return (
     <section>
+      <Titulo texto={edicion ? 'Editar socio' : 'Nuevo socio'} />
       <h1>{edicion ? 'Editar socio' : 'Nuevo socio'}</h1>
       <CargaVista carga={carga} reintentar={recargar}>
         {(socio) => (

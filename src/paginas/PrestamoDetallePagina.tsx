@@ -7,6 +7,7 @@ import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { EtiquetaDePrestamo } from '../componentes/EtiquetaDePrestamo.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
 import { formatearDia, formatearSoles } from '../formato.ts'
@@ -40,6 +41,7 @@ function PrestamoDetalle({ id }: { id: number }) {
 
   return (
     <section>
+      <Titulo texto={`Préstamo #${id}`} />
       <p>
         <Link to="/prestamos">← Préstamos</Link>
       </p>

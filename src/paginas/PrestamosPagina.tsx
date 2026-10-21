@@ -4,6 +4,7 @@ import { useApi } from '../api/contexto.ts'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { EtiquetaDePrestamo } from '../componentes/EtiquetaDePrestamo.tsx'
 import { Paginacion } from '../componentes/Paginacion.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useParametrosDeLista } from '../hooks/useParametrosDeLista.ts'
 import { formatearDia } from '../formato.ts'
@@ -33,6 +34,7 @@ export function PrestamosPagina() {
 
   return (
     <section>
+      <Titulo texto="Préstamos" />
       <div className="titulo-con-accion">
         <h1>Préstamos</h1>
         <Link className="boton" to="/prestamos/nuevo">

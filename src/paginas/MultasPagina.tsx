@@ -5,6 +5,7 @@ import { useApi } from '../api/contexto.ts'
 import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { Paginacion } from '../componentes/Paginacion.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useParametrosDeLista } from '../hooks/useParametrosDeLista.ts'
 import { formatearDia, formatearSoles } from '../formato.ts'
@@ -44,6 +45,7 @@ export function MultasPagina() {
 
   return (
     <section>
+      <Titulo texto="Multas" />
       <h1>Multas</h1>
       <div className="buscador">
         <label>

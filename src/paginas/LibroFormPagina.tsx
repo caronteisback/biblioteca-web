@@ -5,6 +5,7 @@ import type { LibroPedido } from '../api/cliente.ts'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { LibroForm } from '../componentes/LibroForm.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
 
@@ -28,6 +29,7 @@ export function LibroFormPagina({ edicion = false }: { edicion?: boolean }) {
 
   return (
     <section>
+      <Titulo texto={edicion ? 'Editar libro' : 'Nuevo libro'} />
       <h1>{edicion ? 'Editar libro' : 'Nuevo libro'}</h1>
       <CargaVista carga={carga} reintentar={recargar}>
         {(libro) => (

@@ -12,7 +12,7 @@ Browser frontend of the library system: the librarian's panel for the catalog, m
 
 ## Status
 
-Working: the catalog (books and their copies), the members, the loans and the fines: the whole life of a loan from the browser. Left: a pass of tests and polish, and the login once the API has one.
+Working: the catalog (books and their copies), the members, the loans and the fines: the whole life of a loan from the browser. Left: the login, once the API has one.
 
 | Step | What | State |
 |------|------|-------|
@@ -20,7 +20,7 @@ Working: the catalog (books and their copies), the members, the loans and the fi
 | 2 | API client with types generated from the contract | done |
 | 3 | Catalog and members | done |
 | 4 | Loans and fines | done |
-| 5 | Tests and polish | next |
+| 5 | Tests and polish | done |
 
 There is no login yet: the API has no authentication, so this panel is for local use only and must not be exposed to a network.
 
@@ -48,6 +48,32 @@ The API address is `http://localhost:8080` by default. To change it, copy `.env.
 | `npm run api:generate` | Regenerates `src/api/schema.d.ts` from the contract copy |
 | `npm run api:check` | Checks the contract copy and that the generated types are up to date |
 | `npm run preview` | Serves the production build locally |
+
+## How it is tested
+
+```bash
+npm test
+```
+
+69 tests, in four layers:
+
+| Layer | What it proves |
+|-------|----------------|
+| Units | The error and alert messages, the formatting, the API client against a fake network |
+| Screens | Each screen against a fake API: what it shows, what it sends, and the Spanish message for each refusal |
+| Whole journey | `recorrido.test.tsx` walks the **real application** (router, screens, client) over a small in-memory library: register a book, a copy and a member, lend, see a late renewal refused, return late and get fined, be refused a new loan, pay the fine |
+| Accessibility | [axe](https://github.com/dequelabs/axe-core) on every screen finds no violations; page language, tab titles, the skip link, the focus move on navigation and the error notice are checked on their own |
+
+What these tests do **not** do: talk to the real API. The in-memory library follows the rules a screen can show, but the rules themselves are the API's and are tested there ([biblioteca-java](https://github.com/caronteisback/biblioteca-java)). The real pair was checked by hand in a browser, including the late return and the fine; automating that run against the real stack is a possible next step.
+
+Two checks need a real browser and were done in one, not in the tests: colour contrast (axe, in light and dark mode, on every screen, no violations) and the layout at a phone width of 375 px (no horizontal scroll on any screen).
+
+## Accessibility
+
+- Every field has a label, every table header declares its scope, and the controls work with the keyboard.
+- A "Saltar al contenido" link comes first; on each change of screen the focus moves to the content and the tab title changes, since a single-page app does not announce a new page by itself.
+- Colour follows the system's light or dark mode, with contrast checked in both.
+- A screen that fails while drawing shows a notice instead of a blank page.
 
 ## What you can do today
 

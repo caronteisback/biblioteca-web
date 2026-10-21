@@ -67,8 +67,9 @@ a {
 
 .cabecera {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.5rem 1.5rem;
   padding: 0.75rem 1rem;
   background: var(--superficie);
   border-bottom: 1px solid var(--borde);
@@ -76,7 +77,8 @@ a {
 
 .cabecera nav {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
 }
 
 .cabecera nav a {
@@ -357,4 +359,23 @@ select {
 .lista-simple li {
   padding: 0.35rem 0;
   border-bottom: 1px solid var(--borde);
+}
+
+.salto {
+  position: absolute;
+  left: 0.5rem;
+  top: -4rem;
+  padding: 0.5rem 0.9rem;
+  color: var(--acento-texto);
+  background: var(--acento);
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.salto:focus {
+  top: 0.5rem;
+}
+
+main:focus {
+  outline: none;
 }

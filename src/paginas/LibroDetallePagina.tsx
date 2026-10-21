@@ -5,6 +5,7 @@ import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { EjemplaresDelLibro } from '../componentes/EjemplaresDelLibro.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
 
@@ -33,6 +34,7 @@ function LibroDetalle({ id }: { id: number }) {
 
   return (
     <section>
+      <Titulo texto={carga.tipo === 'listo' ? carga.datos.titulo : 'Libro'} />
       <p>
         <Link to="/libros">← Libros</Link>
       </p>

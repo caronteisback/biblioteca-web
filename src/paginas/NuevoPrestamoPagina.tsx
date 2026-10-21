@@ -5,6 +5,7 @@ import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { SelectorEjemplar, type EjemplarElegido } from '../componentes/SelectorEjemplar.tsx'
 import { SelectorSocio, type SocioElegido } from '../componentes/SelectorSocio.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 
 function numeroPositivo(texto: string | null): number | null {
@@ -39,6 +40,7 @@ export function NuevoPrestamoPagina() {
 
   return (
     <section>
+      <Titulo texto="Nuevo préstamo" />
       <h1>Nuevo préstamo</h1>
       <CargaVista carga={carga} reintentar={recargar}>
         {(inicial) => <FormularioDePrestamo socioInicial={inicial.socio} ejemplarInicial={inicial.ejemplar} />}

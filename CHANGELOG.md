@@ -6,6 +6,10 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Added
 
+- **A whole-journey test:** the real application walked over an in-memory library, from a new book to the payment of a fine.
+- **Accessibility:** axe finds no violations on any screen (also checked for colour contrast in light and dark mode in a real browser); a skip link, focus moved to the content when the screen changes, a tab title for each screen, and a notice when a screen fails while drawing.
+- **Small screens:** the navigation wraps; no screen scrolls sideways at 375 px.
+
 - **Loans:** paginated list filtered by state and member; a new-loan screen with a member picker and a picker of available copies (it can open already filled from a member or from a copy); the loan detail with the member and the copy by name, renew, return (asking for confirmation) and the fine a late return creates.
 - **Fines:** paginated list filtered by state and member, and payment of a pending fine.
 - **Member screen:** its active loans and pending fines, and a button to lend.
@@ -14,7 +18,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 - **Catalog:** paginated list of books with search (kept in the address), create, edit and delete; each book shows its copies, with commands to add, retire, restore and delete them and the state of each one.
 - **Members:** paginated list with search, create, edit, deactivate, reactivate and delete; the detail shows the score and the alerts calculated by the API, each with a Spanish text (the build fails if the contract adds an alert code without one).
 - **Navigation:** routes with React Router, a navigation bar, and a "not found" screen for bad addresses.
-- **Tests:** 44 in total; screens are tested against a fake API with Testing Library.
+- **Tests:** 69 in total: units, screens against a fake API, a whole journey over an in-memory library, and an accessibility check of every screen with axe.
 
 - **API client generated from the contract:** a pinned copy of biblioteca-contrato v0.1.1, TypeScript types generated from it (`npm run api:generate`) and a typed client built on openapi-fetch. `npm run api:check` runs in CI and fails if the copy or the types drift.
 - **Errors:** every failed call, network failures included, becomes an `ApiError`; each of the 30 error codes of the contract has a Spanish message, and the build fails if the contract adds a code without one.

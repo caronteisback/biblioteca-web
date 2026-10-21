@@ -6,6 +6,7 @@ import { ActividadDelSocio } from '../componentes/ActividadDelSocio.tsx'
 import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
+import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
 import { useIdDeRuta } from '../hooks/useIdDeRuta.ts'
 import { formatearDia } from '../formato.ts'
@@ -40,6 +41,7 @@ function SocioDetalle({ id }: { id: number }) {
 
   return (
     <section>
+      <Titulo texto={carga.tipo === 'listo' ? carga.datos.nombre : 'Socio'} />
       <p>
         <Link to="/socios">← Socios</Link>
       </p>
