@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { api } from './api/cliente.ts'
+import { mensajeDe } from './api/errores.ts'
 import { API_URL } from './config.ts'
 
 type Estado =
@@ -6,27 +8,20 @@ type Estado =
   | { tipo: 'listo'; libros: number }
   | { tipo: 'error'; detalle: string }
 
-async function leer<T>(ruta: string): Promise<T> {
-  const respuesta = await fetch(`${API_URL}${ruta}`)
-  if (!respuesta.ok) {
-    throw new Error(`${ruta} respondió ${respuesta.status}`)
-  }
-  return respuesta.json() as Promise<T>
-}
-
 function App() {
   const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' })
 
   useEffect(() => {
     let vigente = true
-    leer<{ totalElements: number }>('/api/v1/libros?size=1')
+    api.libros
+      .listar({ size: 1 })
       .then((catalogo) => {
         if (!vigente) return
         setEstado({ tipo: 'listo', libros: catalogo.totalElements })
       })
       .catch((error: unknown) => {
         if (!vigente) return
-        setEstado({ tipo: 'error', detalle: error instanceof Error ? error.message : 'error desconocido' })
+        setEstado({ tipo: 'error', detalle: mensajeDe(error) })
       })
     return () => {
       vigente = false

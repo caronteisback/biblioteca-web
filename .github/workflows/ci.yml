@@ -21,4 +21,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - name: Check the contract copy and the generated types
+        run: npm run api:check
+      - run: npm test
       - run: npm run build
