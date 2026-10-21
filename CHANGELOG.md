@@ -6,6 +6,7 @@ All notable changes are listed here. The format follows [Keep a Changelog](https
 
 ### Fixed
 
+- The proxy check of CI (`scripts/probar-proxy.sh`) judged the first answer it got, which on a slow runner was nginx's 502 while the fake API was still starting. It now waits for a real answer.
 - After signing out on purpose, the next person to sign in landed on the screen the previous one was on (for example `/libros`) instead of their own home, because the protected route remembered that screen when the session ended. A sign-out on purpose now leaves nothing to go back to. Found by signing out and in again as another user against the real API.
 
 ## [0.2.1] - 2026-10-21

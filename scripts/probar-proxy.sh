@@ -34,10 +34,12 @@ HTTPServer(('0.0.0.0', 8080), Eco).serve_forever()
 
 docker run -d --name web-prueba --network "$RED" -p "127.0.0.1:$PUERTO:8080" "$IMAGEN" >/dev/null
 
+# Both containers take a moment to start: until the fake API answers, nginx answers 502 (or nothing). Wait for a real
+# answer of the fake API, which always starts with "Host:", and only then judge it.
 respuesta=""
-for _ in $(seq 1 30); do
+for _ in $(seq 1 60); do
   respuesta="$(curl -s -m 2 -X POST -H "Origin: http://localhost:$PUERTO" "http://localhost:$PUERTO/api/v1/auth/login" || true)"
-  [ -n "$respuesta" ] && break
+  case "$respuesta" in Host:*) break ;; esac
   sleep 1
 done
 
