@@ -76,36 +76,36 @@ export function MultasPagina() {
           ) : (
             <>
               <div className="tabla-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Multa</th>
-                      <th scope="col">Préstamo</th>
-                      <th scope="col">Monto</th>
-                      <th scope="col">Días de retraso</th>
-                      <th scope="col">Generada</th>
-                      <th scope="col">Estado</th>
-                      <th scope="col">Acciones</th>
+                <table className="apilable" role="table">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Multa</th>
+                      <th scope="col" role="columnheader">Préstamo</th>
+                      <th scope="col" role="columnheader">Monto</th>
+                      <th scope="col" role="columnheader">Días de retraso</th>
+                      <th scope="col" role="columnheader">Generada</th>
+                      <th scope="col" role="columnheader">Estado</th>
+                      <th scope="col" role="columnheader">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {lista.items.map((multa) => (
-                      <tr key={multa.id}>
-                        <td>#{multa.id}</td>
-                        <td>
+                      <tr role="row" key={multa.id}>
+                        <td role="cell" data-label="Multa">#{multa.id}</td>
+                        <td role="cell" data-label="Préstamo">
                           <Link to={`/prestamos/${multa.prestamoId}`}>#{multa.prestamoId}</Link>
                         </td>
-                        <td>{formatearSoles(multa.monto)}</td>
-                        <td>{multa.diasRetraso}</td>
-                        <td>{formatearDia(multa.fechaGeneracion)}</td>
-                        <td>
+                        <td role="cell" data-label="Monto">{formatearSoles(multa.monto)}</td>
+                        <td role="cell" data-label="Días de retraso">{multa.diasRetraso}</td>
+                        <td role="cell" data-label="Generada">{formatearDia(multa.fechaGeneracion)}</td>
+                        <td role="cell" data-label="Estado">
                           {multa.estado === 'PENDING' ? (
                             <Estado tono="error">Pendiente</Estado>
                           ) : (
                             <Estado tono="ok">Pagada{multa.fechaPago ? ` el ${formatearDia(multa.fechaPago)}` : ''}</Estado>
                           )}
                         </td>
-                        <td className="acciones">
+                        <td role="cell" data-label="Acciones" className="acciones">
                           {multa.estado === 'PENDING' && (
                             <button type="button" onClick={() => void pagar(multa.id)}>
                               Pagar

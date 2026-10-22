@@ -68,30 +68,30 @@ export function PrestamosPagina() {
           ) : (
             <>
               <div className="tabla-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Préstamo</th>
-                      <th scope="col">Socio</th>
-                      <th scope="col">Ejemplar</th>
-                      <th scope="col">Prestado</th>
-                      <th scope="col">Vence</th>
-                      <th scope="col">Estado</th>
+                <table className="apilable" role="table">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Préstamo</th>
+                      <th scope="col" role="columnheader">Socio</th>
+                      <th scope="col" role="columnheader">Ejemplar</th>
+                      <th scope="col" role="columnheader">Prestado</th>
+                      <th scope="col" role="columnheader">Vence</th>
+                      <th scope="col" role="columnheader">Estado</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {lista.items.map((prestamo) => (
-                      <tr key={prestamo.id}>
-                        <td>
+                      <tr role="row" key={prestamo.id}>
+                        <td role="cell" data-label="Préstamo">
                           <Link to={`/prestamos/${prestamo.id}`}>#{prestamo.id}</Link>
                         </td>
-                        <td>
+                        <td role="cell" data-label="Socio">
                           <Link to={`/socios/${prestamo.socioId}`}>#{prestamo.socioId}</Link>
                         </td>
-                        <td>#{prestamo.ejemplarId}</td>
-                        <td>{formatearDia(prestamo.fechaPrestamo)}</td>
-                        <td>{formatearDia(prestamo.fechaVencimiento)}</td>
-                        <td>
+                        <td role="cell" data-label="Ejemplar">#{prestamo.ejemplarId}</td>
+                        <td role="cell" data-label="Prestado">{formatearDia(prestamo.fechaPrestamo)}</td>
+                        <td role="cell" data-label="Vence">{formatearDia(prestamo.fechaVencimiento)}</td>
+                        <td role="cell" data-label="Estado">
                           <EtiquetaDePrestamo prestamo={prestamo} />
                         </td>
                       </tr>

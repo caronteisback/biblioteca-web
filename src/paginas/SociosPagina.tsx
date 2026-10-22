@@ -38,24 +38,24 @@ export function SociosPagina() {
           ) : (
             <>
               <div className="tabla-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Nombre</th>
-                      <th scope="col">Correo</th>
-                      <th scope="col">Registrado</th>
-                      <th scope="col">Estado</th>
+                <table className="apilable" role="table">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Nombre</th>
+                      <th scope="col" role="columnheader">Correo</th>
+                      <th scope="col" role="columnheader">Registrado</th>
+                      <th scope="col" role="columnheader">Estado</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {lista.items.map((socio) => (
-                      <tr key={socio.id}>
-                        <td>
+                      <tr role="row" key={socio.id}>
+                        <td role="cell" data-label="Nombre">
                           <Link to={`/socios/${socio.id}`}>{socio.nombre}</Link>
                         </td>
-                        <td>{socio.email}</td>
-                        <td>{formatearDia(socio.fechaRegistro)}</td>
-                        <td>
+                        <td role="cell" data-label="Correo">{socio.email}</td>
+                        <td role="cell" data-label="Registrado">{formatearDia(socio.fechaRegistro)}</td>
+                        <td role="cell" data-label="Estado">
                           <Estado tono={socio.activo ? 'ok' : 'neutro'}>{socio.activo ? 'Activo' : 'Desactivado'}</Estado>
                         </td>
                       </tr>

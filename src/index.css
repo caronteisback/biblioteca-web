@@ -659,6 +659,67 @@ main:focus {
   }
 }
 
+/* On a phone each row becomes a card with its labels, so no column is hidden behind a sideways scroll. The roles in
+   the markup keep the table semantics that some screen readers drop when a table is not drawn as one. */
+@media (max-width: 40rem) {
+  .apilable,
+  .apilable tbody {
+    display: block;
+  }
+
+  .apilable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .apilable tr {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.7rem;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+  }
+
+  .apilable td {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.15rem 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .apilable td::before {
+    content: attr(data-label);
+    content: attr(data-label) / '';
+    color: var(--suave);
+    font-size: 0.9rem;
+  }
+
+  .apilable td .estado {
+    justify-self: start;
+  }
+
+  .apilable td.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 0.4rem;
+  }
+
+  .apilable td.acciones::before {
+    content: none;
+  }
+
+  .apilable td.acciones:empty {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lateral,
   .aplicacion {

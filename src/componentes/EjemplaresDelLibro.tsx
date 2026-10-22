@@ -57,23 +57,23 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
               <p>Este libro todavía no tiene ejemplares. Sin ejemplares no se puede prestar.</p>
             ) : (
               <div className="tabla-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Código</th>
-                      <th scope="col">Estado</th>
-                      {puedeGestionar && <th scope="col">Acciones</th>}
+                <table className="apilable" role="table">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Código</th>
+                      <th scope="col" role="columnheader">Estado</th>
+                      {puedeGestionar && <th scope="col" role="columnheader">Acciones</th>}
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {lista.items.map((ejemplar) => (
-                      <tr key={ejemplar.id}>
-                        <td>{ejemplar.codigo}</td>
-                        <td>
+                      <tr role="row" key={ejemplar.id}>
+                        <td role="cell" data-label="Código">{ejemplar.codigo}</td>
+                        <td role="cell" data-label="Estado">
                           <Estado tono={TONO_DEL_EJEMPLAR[estadoDelEjemplar(ejemplar)]}>{estadoDelEjemplar(ejemplar)}</Estado>
                         </td>
                         {puedeGestionar && (
-                          <td className="acciones">
+                          <td role="cell" data-label="Acciones" className="acciones">
                           {ejemplar.activo && ejemplar.disponible && (
                             <Link className="boton" to={`/prestamos/nuevo?ejemplarId=${ejemplar.id}`}>
                               Prestar

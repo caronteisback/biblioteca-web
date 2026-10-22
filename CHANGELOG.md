@@ -19,7 +19,8 @@ A new look; no screen changes what it does and the API and the contract are unto
 
 - The pages sit on a card over a pale background instead of directly on the page.
 - "Salir" moved into the user menu; the tests sign out through it.
-- Tests: 187 (from 144).
+- Tests: 192 (from 144). The long whole-journey tests got a 20 s limit: with every test file running at once they could pass the default 5 s.
+- **Tables become cards on a phone** (up to 640 px): each row is a card with the column name in front of every value, so no column such as "Estado" hides behind a sideways scroll. The table roles are explicit in the markup, since some screen readers stop treating a table as one when it is not drawn as a table, and the generated labels are marked decorative so they are not read twice. `tablas.test.tsx` keeps labels, roles and headers in step.
 - Small screens: titles with an action, inline forms and the member sheet wrap instead of overflowing; the sheet stacks its labels over their values. Checked in a real browser on every screen at 390 and 768 px (no horizontal scroll outside the tables, which scroll inside their own box; axe finds nothing).
 
 ### Fixed

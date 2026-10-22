@@ -40,24 +40,24 @@ export function LibrosPagina() {
           ) : (
             <>
               <div className="tabla-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Título</th>
-                      <th scope="col">Autor</th>
-                      <th scope="col">ISBN</th>
-                      <th scope="col">Año</th>
+                <table className="apilable" role="table">
+                  <thead role="rowgroup">
+                    <tr role="row">
+                      <th scope="col" role="columnheader">Título</th>
+                      <th scope="col" role="columnheader">Autor</th>
+                      <th scope="col" role="columnheader">ISBN</th>
+                      <th scope="col" role="columnheader">Año</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody role="rowgroup">
                     {lista.items.map((libro) => (
-                      <tr key={libro.id}>
-                        <td>
+                      <tr role="row" key={libro.id}>
+                        <td role="cell" data-label="Título">
                           <Link to={`/libros/${libro.id}`}>{libro.titulo}</Link>
                         </td>
-                        <td>{libro.autor}</td>
-                        <td>{libro.isbn}</td>
-                        <td>{libro.anioPublicacion ?? '—'}</td>
+                        <td role="cell" data-label="Autor">{libro.autor}</td>
+                        <td role="cell" data-label="ISBN">{libro.isbn}</td>
+                        <td role="cell" data-label="Año">{libro.anioPublicacion ?? '—'}</td>
                       </tr>
                     ))}
                   </tbody>

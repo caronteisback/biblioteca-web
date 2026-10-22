@@ -66,7 +66,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 npm test
 ```
 
-187 tests, in four layers:
+192 tests, in four layers:
 
 | Layer | What it proves |
 |-------|----------------|
@@ -85,7 +85,7 @@ Two checks need a real browser and were done in one, not in the tests: the colou
 - A "Saltar al contenido" link comes first; on each change of screen the focus moves to the content and the tab title changes, since a single-page app does not announce a new page by itself.
 - A light theme and a dark one, chosen from the user menu and remembered; the contrast of every pair of colours is checked in both.
 - A status is never shown by colour alone: it always has an icon and its words.
-- The side menu can be folded to its icons on a wide screen (and the choice is remembered); on a phone it folds behind a button and closes with Escape.
+- The side menu can be folded to its icons on a wide screen (and the choice is remembered); on a phone it folds behind a button and closes with Escape, and the tables turn into cards with their labels, with the table roles kept for screen readers.
 - A screen that fails while drawing shows a notice instead of a blank page.
 
 ## Signing in

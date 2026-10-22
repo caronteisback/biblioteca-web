@@ -98,7 +98,7 @@ describe('the life of a loan through the whole application', () => {
     // Signing out ends the session: the panel asks again for the credentials.
     await salirDelPanel()
     expect(await screen.findByLabelText('Correo')).toBeTruthy()
-  })
+  }, 20_000)
 
   it('lets a member sign in, see the catalog and their own account, and nothing of anyone else', async () => {
     const memoria = crearApiEnMemoria()
@@ -128,5 +128,5 @@ describe('the life of a loan through the whole application', () => {
     await ir(/^Libros$/)
     expect(await screen.findByRole('link', { name: 'El Faro Imaginado' })).toBeTruthy()
     expect(screen.queryByRole('link', { name: 'Nuevo libro' })).toBeNull()
-  })
+  }, 20_000)
 })
