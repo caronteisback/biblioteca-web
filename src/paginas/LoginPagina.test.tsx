@@ -35,13 +35,13 @@ async function rellenar(email = 'ana@example.org', password = 'una-contrasena-la
 }
 
 describe('LoginPagina', () => {
-  it('signs a librarian in and opens the catalog', async () => {
+  it('signs a librarian in and opens the home', async () => {
     const entrar = vi.fn().mockResolvedValue(respuesta('LIBRARIAN'))
     pantalla(entrar)
 
     await rellenar('  ana@example.org ')
 
-    expect(await screen.findByText('Pantalla de libros')).toBeTruthy()
+    expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
     expect(entrar).toHaveBeenCalledWith('ana@example.org', 'una-contrasena-larga')
     expect(obtenerSesion()?.token).toBe('el-token')
   })
@@ -77,7 +77,7 @@ describe('LoginPagina', () => {
 
       await rellenar()
 
-      expect(await screen.findByText('Pantalla de libros')).toBeTruthy()
+      expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
     },
   )
 
@@ -120,7 +120,7 @@ describe('LoginPagina', () => {
     const boton = screen.getByRole('button', { name: 'Entrando…' }) as HTMLButtonElement
     expect(boton.disabled).toBe(true)
     terminar(respuesta('LIBRARIAN'))
-    expect(await screen.findByText('Pantalla de libros')).toBeTruthy()
+    expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
   })
 
   it('tells why the previous session ended', async () => {
@@ -135,11 +135,11 @@ describe('LoginPagina', () => {
     renderizar(
       <Routes>
         <Route path="/login" element={<LoginPagina />} />
-        <Route path="/libros" element={<p>Pantalla de libros</p>} />
+        <Route path="/inicio" element={<p>Pantalla de inicio</p>} />
       </Routes>,
       { api: {}, ruta: '/login', sesion: 'LIBRARIAN' },
     )
 
-    expect(await screen.findByText('Pantalla de libros')).toBeTruthy()
+    expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
   })
 })

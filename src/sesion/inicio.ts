@@ -1,8 +1,8 @@
 import type { Rol } from '../api/cliente.ts'
 
-/** Where each role starts: the librarian in the catalog, the member at their home. Nobody signed in goes to sign in. */
+/** Where each role starts: at their home. Nobody signed in goes to sign in. */
 export function inicioDe(rol: Rol | null): string {
-  if (rol === 'LIBRARIAN') return '/libros'
+  if (rol === 'LIBRARIAN') return '/inicio'
   if (rol === 'MEMBER') return '/inicio'
   return '/login'
 }

@@ -6,6 +6,14 @@ export function formatearDia(iso: string): string {
   return partes ? `${partes[3]}/${partes[2]}/${partes[1]}` : iso
 }
 
+const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+
+/** "2026-10-12" as "12 oct": a short day for a label that has little room. Anything else is returned as it came. */
+export function formatearSemana(iso: string): string {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  return partes ? `${Number(partes[3])} ${MESES[Number(partes[2]) - 1]}` : iso
+}
+
 /** A copy is "De baja" when retired, "Prestado" when active but on loan, "Disponible" otherwise. */
 export function estadoDelEjemplar(ejemplar: Pick<Ejemplar, 'activo' | 'disponible'>): string {
   if (!ejemplar.activo) return 'De baja'

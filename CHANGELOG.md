@@ -2,6 +2,25 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.5.0] - 2026-10-22
+
+**Needs the API 0.5.0** (contract v0.4.0): the home of a librarian reads `GET /api/v1/panel`.
+
+### Added
+
+- **Inicio for the librarian** (`/inicio`), which is now where a librarian lands after signing in:
+  - Four figures, each a link to the list it counts: **active loans** (of the copies that can be lent), **overdue**, **due within 7 days** and **pending fines** (their total and how many members owe them). Each says in words what it asks ("Atender", "Avisar", "Cobrar", or "Al día" when there is nothing to do), with an icon as well as the colour.
+  - **Loans per week** of the last 6 weeks and the **most borrowed books** of the last 90 days, as bars. The bars are lists of real text (a label and a number); the drawing is hidden from screen readers. No chart library.
+  - **Requieren atención**: the loans to chase first, the most overdue first and then the ones due soon, each with its member, book, state and a link to the loan.
+- Everybody has **Inicio** at the top of the menu; the screen is the librarian's or the member's according to the role.
+- `Cifra` and `Barras` components, and `formatearSemana` ("12 oct").
+- Tests: 260 (from 238): the two components, the screen in every state, and the librarian's journey now looks at the home while a loan is overdue and while a fine is pending.
+
+### Changed
+
+- A librarian lands on the home instead of the catalog (the catalog is one click away).
+- Contract v0.4.0; the in-memory library of the tests works the dashboard out from what it holds.
+
 ## [0.4.0] - 2026-10-22
 
 **Needs the API 0.4.0** (contract v0.3.0): the home of a member reads `reglas` from `/me` and the title of each loan.

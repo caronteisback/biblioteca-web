@@ -62,11 +62,9 @@ export function Layout() {
           <span className="texto-del-menu">Biblioteca</span>
         </strong>
         <nav aria-label="Principal">
-          {rol === 'MEMBER' && (
-            <Entrada to="/inicio" icono="inicio">
-              Inicio
-            </Entrada>
-          )}
+          <Entrada to="/inicio" icono="inicio">
+            Inicio
+          </Entrada>
           <Entrada to="/libros" icono="libros">
             Libros
           </Entrada>

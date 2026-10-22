@@ -3,7 +3,7 @@ import { destinoTrasEntrar, inicioDe } from './inicio.ts'
 
 describe('inicioDe', () => {
   it('starts each role where it works, and nobody at the sign-in', () => {
-    expect(inicioDe('LIBRARIAN')).toBe('/libros')
+    expect(inicioDe('LIBRARIAN')).toBe('/inicio')
     expect(inicioDe('MEMBER')).toBe('/inicio')
     expect(inicioDe(null)).toBe('/login')
   })
@@ -11,7 +11,7 @@ describe('inicioDe', () => {
 
 describe('destinoTrasEntrar', () => {
   it('starts at the home of the role when nobody asked for a screen', () => {
-    expect(destinoTrasEntrar('LIBRARIAN', null)).toBe('/libros')
+    expect(destinoTrasEntrar('LIBRARIAN', null)).toBe('/inicio')
     expect(destinoTrasEntrar('MEMBER', null)).toBe('/inicio')
   })
 
@@ -21,7 +21,7 @@ describe('destinoTrasEntrar', () => {
   })
 
   it('does not take a librarian to "my account", which is not theirs', () => {
-    expect(destinoTrasEntrar('LIBRARIAN', '/cuenta')).toBe('/libros')
+    expect(destinoTrasEntrar('LIBRARIAN', '/cuenta')).toBe('/inicio')
   })
 
   it('takes a member back to their home or their account when they asked for those', () => {

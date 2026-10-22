@@ -1,4 +1,4 @@
-import type { Alerta, Api, Ejemplar, Libro, Multa, Pagina, Prestamo, Rol, Socio, Usuario } from '../api/cliente.ts'
+import type { Alerta, Api, Ejemplar, Libro, Multa, Pagina, Panel, Prestamo, Rol, Socio, Usuario } from '../api/cliente.ts'
 import { ApiError } from '../api/errores.ts'
 import { obtenerSesion } from '../sesion/estado.ts'
 import { REGLAS } from './reglas.ts'
@@ -193,6 +193,63 @@ export function crearApiEnMemoria() {
         buscar(socios, id, 'MEMBER_NOT_FOUND')
         if (prestamos.some((p) => p.socioId === id)) throw new ApiError(409, 'MEMBER_HAS_HISTORY', null)
         socios.splice(socios.findIndex((s) => s.id === id), 1)
+      },
+    },
+    panel: {
+      /** The figures of the dashboard, worked out from what is in memory the way the API works them out from the database. */
+      resumen: async (): Promise<Panel> => {
+        const dias = 7
+        const activos = prestamos.filter((p) => p.activo).map(vista)
+        const pendientes = multas.filter((m) => m.estado === 'PENDING')
+        const lunes = (dia: string) => {
+          const d = new Date(`${dia}T00:00:00Z`)
+          return sumarDias(dia, -((d.getUTCDay() + 6) % 7))
+        }
+        const primera = sumarDias(lunes(HOY), -35)
+        const semanas = Array.from({ length: 6 }, (_, i) => sumarDias(primera, 7 * i))
+        const porLibro = new Map<number, number>()
+        for (const p of prestamos) {
+          const ejemplar = ejemplares.find((e) => e.id === p.ejemplarId)
+          if (ejemplar) porLibro.set(ejemplar.libroId, (porLibro.get(ejemplar.libroId) ?? 0) + 1)
+        }
+        const casos = activos
+          .filter((p) => diasEntre(HOY, p.fechaVencimiento) <= dias)
+          .sort((a, b) => a.fechaVencimiento.localeCompare(b.fechaVencimiento) || a.id - b.id)
+          .slice(0, 5)
+        return {
+          fecha: HOY,
+          prestamos: {
+            activos: activos.length,
+            vencidos: activos.filter((p) => p.diasRetraso > 0).length,
+            porVencer: activos.filter((p) => p.diasRetraso === 0 && diasEntre(HOY, p.fechaVencimiento) <= dias).length,
+            diasPorVencer: dias,
+          },
+          ejemplaresActivos: ejemplares.filter((e) => e.activo).length,
+          sociosActivos: socios.filter((s) => s.activo).length,
+          multas: {
+            pendientes: pendientes.length,
+            montoPendiente: pendientes.reduce((suma, m) => suma + m.monto, 0),
+            sociosConMultaPendiente: new Set(pendientes.map((m) => prestamos.find((p) => p.id === m.prestamoId)?.socioId)).size,
+          },
+          prestamosPorSemana: semanas.map((semana) => ({
+            semana,
+            prestamos: prestamos.filter((p) => lunes(p.fechaPrestamo) === semana).length,
+          })),
+          masPrestados: [...porLibro.entries()]
+            .map(([libroId, cuenta]) => ({ libroId, titulo: libros.find((l) => l.id === libroId)?.titulo ?? '', prestamos: cuenta }))
+            .sort((a, b) => b.prestamos - a.prestamos || a.titulo.localeCompare(b.titulo))
+            .slice(0, 5),
+          requierenAtencion: casos.map((p) => ({
+            prestamoId: p.id,
+            socioId: p.socioId,
+            nombreSocio: socios.find((s) => s.id === p.socioId)?.nombre ?? '',
+            tituloLibro: p.tituloLibro,
+            codigoEjemplar: p.codigoEjemplar,
+            fechaVencimiento: p.fechaVencimiento,
+            diasRetraso: p.diasRetraso,
+            alerta: p.diasRetraso > 0 ? ('OVERDUE' as const) : ('DUE_SOON' as const),
+          })),
+        }
       },
     },
     prestamos: {

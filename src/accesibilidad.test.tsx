@@ -34,6 +34,7 @@ async function violaciones() {
 
 describe('accessibility of every screen (axe)', () => {
   it.each([
+    ['the home of a librarian', () => '/inicio', 'Requieren atención'],
     ['the book list', () => '/libros', 'El Faro Imaginado'],
     ['a new book', () => '/libros/nuevo', 'Crear libro'],
     ['a book with its copies', (d: Datos) => `/libros/${d.libro.id}`, 'EJ-2'],

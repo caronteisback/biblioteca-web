@@ -66,7 +66,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 npm test
 ```
 
-238 tests, in four layers:
+260 tests, in four layers:
 
 | Layer | What it proves |
 |-------|----------------|
@@ -94,7 +94,7 @@ Every screen but the sign-in asks for a session. The panel signs in through the 
 
 | Role | Sees |
 |------|------|
-| **Librarian** | The whole panel: catalog, members, loans and fines |
+| **Librarian** | The whole panel, starting at **Inicio** (the figures that say what needs doing today, loans per week, the most borrowed books and the loans to chase), then the catalog, members, loans and fines |
 | **Member** | **Inicio** (two gauges: score and loans against the limit, what needs attention and the books on loan), the catalog to read (no create, edit, delete or lend buttons) and **Mi cuenta**: their score, alerts, active loans and pending fines. The API gives each member only their own data |
 
 - **A reload keeps the session; closing the tab ends it.** An expired token ends the session by itself, and the sign-in says why.
@@ -108,7 +108,8 @@ Every screen but the sign-in asks for a session. The panel signs in through the 
 | Screen | Address | What it does |
 |--------|---------|--------------|
 | Sign in | `/login` | Email and password; says in Spanish why a sign-in failed (wrong credentials, too many attempts) |
-| Home | `/inicio` | Members only: a score gauge (red below the minimum to borrow, amber up to 80, green above) and a gauge of active loans against the limit, both with their zone in words; the alerts and the loans on hand, each named by its book |
+| Home (librarian) | `/inicio` | Librarians: active, overdue and soon-to-be-due loans and pending fines, each a link to its list; loans per week and the most borrowed books as bars; the loans that need attention first. Everything is worked out by the API (`GET /api/v1/panel`) |
+| Home (member) | `/inicio` | Members: a score gauge (red below the minimum to borrow, amber up to 80, green above) and a gauge of active loans against the limit, both with their zone in words; the alerts and the loans on hand, each named by its book |
 | My account | `/cuenta` | Members only: their data, score, alerts, active loans and pending fines |
 | Books | `/libros` | Paginated list with a search on title or author; the search and the page live in the address, so reload and "back" keep them |
 | New and edit book | `/libros/nuevo`, `/libros/:id/editar` | Forms; the API's answer is shown in Spanish, with the field detail when the data is invalid |

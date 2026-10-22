@@ -4,6 +4,7 @@ import { NoEncontrada } from './componentes/NoEncontrada.tsx'
 import { RutaProtegida } from './componentes/RutaProtegida.tsx'
 import { LibroDetallePagina } from './paginas/LibroDetallePagina.tsx'
 import { LibroFormPagina } from './paginas/LibroFormPagina.tsx'
+import { InicioBibliotecariaPagina } from './paginas/InicioBibliotecariaPagina.tsx'
 import { InicioPagina } from './paginas/InicioPagina.tsx'
 import { LibrosPagina } from './paginas/LibrosPagina.tsx'
 import { LoginPagina } from './paginas/LoginPagina.tsx'
@@ -23,6 +24,12 @@ function Inicio() {
   return <Navigate to={inicioDe(rol)} replace />
 }
 
+/** Everybody has a home, but each role's tells different things: the librarian what needs doing, the member how they stand. */
+function PaginaDeInicio() {
+  const { rol } = useSesion()
+  return rol === 'LIBRARIAN' ? <InicioBibliotecariaPagina /> : <InicioPagina />
+}
+
 /**
  * The screens, by who may see them. The catalog is for both roles (the member only reads it); the rest of the
  * panel is for librarians, and "Mi cuenta" for members. The API enforces the same rules on every call.
@@ -39,14 +46,7 @@ function App() {
         }
       >
         <Route index element={<Inicio />} />
-        <Route
-          path="inicio"
-          element={
-            <RutaProtegida roles={['MEMBER']}>
-              <InicioPagina />
-            </RutaProtegida>
-          }
-        />
+        <Route path="inicio" element={<PaginaDeInicio />} />
         <Route path="libros" element={<LibrosPagina />} />
         <Route
           element={

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estadoDelEjemplar, estadoDelPrestamo, formatearDia, formatearSoles } from './formato.ts'
+import { estadoDelEjemplar, estadoDelPrestamo, formatearDia, formatearSemana, formatearSoles } from './formato.ts'
 
 describe('formatearDia', () => {
   it('writes a day as day/month/year', () => {
@@ -9,6 +9,18 @@ describe('formatearDia', () => {
   it('returns anything else as it came', () => {
     expect(formatearDia('ayer')).toBe('ayer')
     expect(formatearDia('')).toBe('')
+  })
+})
+
+describe('formatearSemana', () => {
+  it('writes a day as a short day and month', () => {
+    expect(formatearSemana('2026-10-12')).toBe('12 oct')
+    expect(formatearSemana('2026-01-05')).toBe('5 ene')
+    expect(formatearSemana('2026-12-28')).toBe('28 dic')
+  })
+
+  it('returns anything else as it came', () => {
+    expect(formatearSemana('pronto')).toBe('pronto')
   })
 })
 

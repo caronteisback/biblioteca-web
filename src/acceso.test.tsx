@@ -48,13 +48,15 @@ describe('who sees what', () => {
 
     renderizar(<App />, { api, ruta: '/' })
 
-    expect(await screen.findByRole('heading', { name: 'Libros' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeTruthy()
     const menu = screen.getByRole('navigation', { name: 'Principal' })
-    for (const nombre of ['Libros', 'Socios', 'Préstamos', 'Multas']) {
+    for (const nombre of ['Inicio', 'Libros', 'Socios', 'Préstamos', 'Multas']) {
       expect(menu.textContent).toContain(nombre)
     }
     expect(menu.textContent).not.toContain('Mi cuenta')
-    expect(screen.getByRole('link', { name: 'Nuevo libro' })).toBeTruthy()
+
+    await userEvent.click(screen.getByRole('link', { name: 'Libros' }))
+    expect(await screen.findByRole('link', { name: 'Nuevo libro' })).toBeTruthy()
   })
 
   it('shows a member only the catalog and their own account', async () => {
@@ -90,7 +92,7 @@ describe('who sees what', () => {
     renderizar(<App />, { api, ruta: '/cuenta' })
 
     expect(await screen.findByRole('heading', { name: 'Sin permiso' })).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Ir a mi inicio' }).getAttribute('href')).toBe('/libros')
+    expect(screen.getByRole('link', { name: 'Ir a mi inicio' }).getAttribute('href')).toBe('/inicio')
   })
 
   it('signs out, forgets the session and asks to sign in again', async () => {

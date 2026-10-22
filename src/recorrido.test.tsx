@@ -30,12 +30,15 @@ describe('the life of a loan through the whole application', () => {
     const memoria = crearApiEnMemoria()
     renderizar(<App />, { api: memoria.api, ruta: '/', sesion: null })
 
-    // Nobody is signed in: the panel asks for the credentials of the librarian, who lands in the catalog.
+    // Nobody is signed in: the panel asks for the credentials of the librarian, who lands on the home.
     await escribir('Correo', BIBLIOTECARIA.email)
     await escribir('Contraseña', BIBLIOTECARIA.password)
     await pulsar('Entrar')
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeTruthy()
+    expect(await screen.findByText('Nada urgente: no hay préstamos vencidos ni por vencer.')).toBeTruthy()
 
     // The catalog starts empty and gets a book with a copy.
+    await ir(/^Libros$/)
     expect(await screen.findByText('Todavía no hay libros en el catálogo.')).toBeTruthy()
     await ir(/^Nuevo libro$/)
     await escribir(/ISBN/, '978-0-306-40615-7')
@@ -69,6 +72,12 @@ describe('the life of a loan through the whole application', () => {
 
     // Weeks pass. The loan is overdue, and the renewal is refused with the reason.
     memoria.envejecerPrestamos(19)
+    // The home of the librarian now says which loan to chase, and that there is something to attend.
+    await ir(/^Inicio$/)
+    const atencion = (await screen.findByRole('heading', { name: 'Requieren atención' })).closest('section') as HTMLElement
+    expect(await within(atencion).findByText('Rosa Ficticia')).toBeTruthy()
+    expect(within(atencion).getByText('Vencido (5 d)')).toBeTruthy()
+    expect(within(screen.getByRole('link', { name: /Vencidos/ })).getByText('Atender')).toBeTruthy()
     await ir(/^Préstamos$/)
     // The first link of the row is the loan; the next ones are its member.
     await userEvent.click((await screen.findAllByRole('link', { name: /^#\d+$/ }))[0])
@@ -81,6 +90,11 @@ describe('the life of a loan through the whole application', () => {
     await pulsar('Registrar devolución')
     expect(await screen.findByText('S/ 5.00')).toBeTruthy()
     expect(screen.getByText(/pendiente de pago/)).toBeTruthy()
+
+    // The fine shows on the home, with its amount and the member that owes it.
+    await ir(/^Inicio$/)
+    expect((await screen.findByRole('link', { name: /Multas pendientes/ })).textContent).toContain('S/ 5.00 · 1 socio')
+    expect(within(screen.getByRole('link', { name: /Vencidos/ })).getByText('Al día')).toBeTruthy()
 
     // With a pending fine the member cannot borrow again.
     await ir(/^Préstamos$/)

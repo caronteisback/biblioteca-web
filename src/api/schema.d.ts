@@ -269,6 +269,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/panel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the dashboard of the library
+         * @description The figures for the home of the librarian, all as of today (in the library's time zone) and calculated now from the loans, fines and members: nothing is stored.
+         *
+         *     - `prestamos`: active loans, how many are overdue and how many are due within `diasPorVencer` days (today included).
+         *     - `multas`: the pending fines, their total and how many members have one.
+         *     - `prestamosPorSemana`: loans started in each of the last 6 weeks, the current one included, oldest first. A week starts on Monday; a week without loans counts 0.
+         *     - `masPrestados`: up to 5 books with the most loans started in the last 90 days.
+         *     - `requierenAtencion`: up to 5 active loans that are overdue (the most late first) or due within `diasPorVencer` days (the soonest first).
+         */
+        get: operations["getDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/prestamos": {
         parameters: {
             query?: never;
@@ -448,6 +474,28 @@ export interface components {
             code: "DUE_SOON" | "OVERDUE" | "PENDING_FINE" | "LOW_SCORE";
             message: string;
         };
+        /** @description An active loan that needs the librarian's attention. */
+        CasoDeAtencion: {
+            /**
+             * @description OVERDUE when the due date has passed, DUE_SOON when it is within the days that the dashboard counts as soon.
+             * @enum {string}
+             */
+            alerta: "DUE_SOON" | "OVERDUE";
+            codigoEjemplar: string;
+            /**
+             * Format: int32
+             * @description Days late as of today; zero when the loan is only due soon.
+             */
+            diasRetraso: number;
+            /** Format: date */
+            fechaVencimiento: string;
+            nombreSocio: string;
+            /** Format: int64 */
+            prestamoId: number;
+            /** Format: int64 */
+            socioId: number;
+            tituloLibro: string;
+        };
         EjemplarRequest: {
             codigo: string;
         };
@@ -469,6 +517,16 @@ export interface components {
              */
             code: "VALIDATION_ERROR" | "BOOK_NOT_FOUND" | "COPY_NOT_FOUND" | "MEMBER_NOT_FOUND" | "LOAN_NOT_FOUND" | "FINE_NOT_FOUND" | "ENDPOINT_NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "COPY_ALREADY_ON_LOAN" | "LOAN_ALREADY_RETURNED" | "FINE_ALREADY_PAID" | "DUPLICATE_ISBN" | "DUPLICATE_EMAIL" | "DUPLICATE_COPY_CODE" | "BOOK_HAS_COPIES" | "COPY_HAS_HISTORY" | "COPY_HAS_ACTIVE_LOAN" | "MEMBER_HAS_HISTORY" | "MEMBER_HAS_ACTIVE_LOANS" | "CONCURRENT_UPDATE" | "MEMBER_INACTIVE" | "COPY_INACTIVE" | "MEMBER_HAS_OVERDUE_LOAN" | "MEMBER_HAS_PENDING_FINE" | "MEMBER_BLOCKED_BY_SCORE" | "LOAN_LIMIT_REACHED" | "RENEWAL_LIMIT_REACHED" | "RENEWAL_NOT_ALLOWED_OVERDUE" | "INTERNAL_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "INVALID_CREDENTIALS" | "TOO_MANY_ATTEMPTS";
             message: string;
+        };
+        LibroMasPrestado: {
+            /** Format: int64 */
+            libroId: number;
+            /**
+             * Format: int64
+             * @description Loans of any copy of the book started in the last 90 days.
+             */
+            prestamos: number;
+            titulo: string;
         };
         LibroRequest: {
             /** Format: int32 */
@@ -593,6 +651,29 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        /** @description The figures of the dashboard of the librarian, as of today. */
+        PanelResponse: {
+            /**
+             * Format: int64
+             * @description Copies that can be lent (not retired).
+             */
+            ejemplaresActivos: number;
+            /**
+             * Format: date
+             * @description Today in the library's time zone, set by the server. Every figure is as of this day.
+             */
+            fecha: string;
+            /** @description Up to 5 books with the most loans started in the last 90 days, the most borrowed first. */
+            masPrestados: components["schemas"]["LibroMasPrestado"][];
+            multas: components["schemas"]["ResumenDeMultas"];
+            prestamos: components["schemas"]["ResumenDePrestamos"];
+            /** @description Loans started in each of the last 6 weeks, the current one included, oldest first. Always 6 entries. */
+            prestamosPorSemana: components["schemas"]["SemanaDePrestamos"][];
+            /** @description Up to 5 active loans that are overdue (the most late first) or due soon (the soonest first). */
+            requierenAtencion: components["schemas"]["CasoDeAtencion"][];
+            /** Format: int64 */
+            sociosActivos: number;
+        };
         PrestamoRequest: {
             /** Format: int64 */
             ejemplarId: number;
@@ -664,6 +745,51 @@ export interface components {
              * @description A member whose score is below this cannot start new loans (MEMBER_BLOCKED_BY_SCORE).
              */
             puntajeMinimo: number;
+        };
+        ResumenDeMultas: {
+            /**
+             * @description Total of the pending fines, in soles.
+             * @example 19
+             */
+            montoPendiente: number;
+            /** Format: int64 */
+            pendientes: number;
+            /**
+             * Format: int64
+             * @description Members with at least one pending fine; they cannot start new loans until they pay.
+             */
+            sociosConMultaPendiente: number;
+        };
+        ResumenDePrestamos: {
+            /**
+             * Format: int64
+             * @description Loans whose copy has not been returned.
+             */
+            activos: number;
+            /**
+             * Format: int32
+             * @description The window, in days, that `porVencer` counts (today included).
+             */
+            diasPorVencer: number;
+            /**
+             * Format: int64
+             * @description Active loans, not yet overdue, due within `diasPorVencer` days.
+             */
+            porVencer: number;
+            /**
+             * Format: int64
+             * @description Active loans whose due date has passed.
+             */
+            vencidos: number;
+        };
+        SemanaDePrestamos: {
+            /** Format: int64 */
+            prestamos: number;
+            /**
+             * Format: date
+             * @description The Monday that starts the week.
+             */
+            semana: string;
         };
         SocioRequest: {
             /** Format: email */
@@ -1943,6 +2069,53 @@ export interface operations {
             };
             /** @description Error. Possible codes: `FINE_ALREADY_PAID`, `CONCURRENT_UPDATE`. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `INTERNAL_ERROR`. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getDashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PanelResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `UNAUTHENTICATED`. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Possible codes: `FORBIDDEN`. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

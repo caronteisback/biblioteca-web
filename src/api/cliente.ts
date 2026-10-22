@@ -16,6 +16,7 @@ export type Rol = Usuario['rol']
 export type Prestamo = components['schemas']['PrestamoResponse']
 export type Multa = components['schemas']['MultaResponse']
 export type EstadoMulta = Multa['estado']
+export type Panel = components['schemas']['PanelResponse']
 
 /** One page of a list, as every list of the API answers it. */
 export interface Pagina<T> {
@@ -98,6 +99,9 @@ export function crearApi(cliente = crearCliente()) {
         resolver(cliente.GET('/api/v1/me/prestamos', { params: { query: consulta } })),
       misMultas: (consulta: Omit<Consulta, 'q'> & { estado?: EstadoMulta } = {}) =>
         resolver(cliente.GET('/api/v1/me/multas', { params: { query: consulta } })),
+    },
+    panel: {
+      resumen: () => resolver(cliente.GET('/api/v1/panel')),
     },
     libros: {
       listar: (consulta: Consulta = {}) => resolver(cliente.GET('/api/v1/libros', { params: { query: consulta } })),
