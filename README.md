@@ -66,7 +66,7 @@ The [biblioteca](https://github.com/caronteisback/biblioteca) repository starts 
 npm test
 ```
 
-192 tests, in four layers:
+238 tests, in four layers:
 
 | Layer | What it proves |
 |-------|----------------|
@@ -95,11 +95,11 @@ Every screen but the sign-in asks for a session. The panel signs in through the 
 | Role | Sees |
 |------|------|
 | **Librarian** | The whole panel: catalog, members, loans and fines |
-| **Member** | The catalog to read (no create, edit, delete or lend buttons) and **Mi cuenta**: their score, alerts, active loans and pending fines. The API gives each member only their own data |
+| **Member** | **Inicio** (two gauges: score and loans against the limit, what needs attention and the books on loan), the catalog to read (no create, edit, delete or lend buttons) and **Mi cuenta**: their score, alerts, active loans and pending fines. The API gives each member only their own data |
 
 - **A reload keeps the session; closing the tab ends it.** An expired token ends the session by itself, and the sign-in says why.
 - **If the API refuses the token** (a 401 on any call), the session ends and the panel goes back to the sign-in with a notice. A refusal for the role (403) does not end it.
-- **After signing in** you go back to the screen you were heading for, only if your role can see it; a member who asked for a librarian screen lands in their account instead of on a refusal. After signing out on purpose nothing is remembered: the next person starts at their own home.
+- **After signing in** you go back to the screen you were heading for, only if your role can see it; a member who asked for a librarian screen lands on their home instead of on a refusal. After signing out on purpose nothing is remembered: the next person starts at their own home.
 - **Why `sessionStorage`:** it survives a reload and is cleared when the tab closes. A script on the page could read it, which is why the page is served with a strict Content-Security-Policy and loads nothing from other sites. The alternatives were keeping the token only in memory (safer, but a reload signs you out) or an `HttpOnly` cookie (not readable by scripts, but it needs CSRF protection and a different way for the API to read the credential).
 - **Signing out** forgets the token. It cannot revoke it: the API's tokens last 60 minutes and are not revoked early.
 
@@ -108,6 +108,7 @@ Every screen but the sign-in asks for a session. The panel signs in through the 
 | Screen | Address | What it does |
 |--------|---------|--------------|
 | Sign in | `/login` | Email and password; says in Spanish why a sign-in failed (wrong credentials, too many attempts) |
+| Home | `/inicio` | Members only: a score gauge (red below the minimum to borrow, amber up to 80, green above) and a gauge of active loans against the limit, both with their zone in words; the alerts and the loans on hand, each named by its book |
 | My account | `/cuenta` | Members only: their data, score, alerts, active loans and pending fines |
 | Books | `/libros` | Paginated list with a search on title or author; the search and the page live in the address, so reload and "back" keep them |
 | New and edit book | `/libros/nuevo`, `/libros/:id/editar` | Forms; the API's answer is shown in Spanish, with the field detail when the data is invalid |

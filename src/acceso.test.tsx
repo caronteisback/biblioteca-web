@@ -62,8 +62,9 @@ describe('who sees what', () => {
 
     renderizar(<App />, { api, ruta: '/', sesion: sesionDe('MEMBER', 'rosa@example.org') })
 
-    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeTruthy()
     const menu = screen.getByRole('navigation', { name: 'Principal' })
+    expect(menu.textContent).toContain('Inicio')
     expect(menu.textContent).toContain('Libros')
     expect(menu.textContent).toContain('Mi cuenta')
     for (const nombre of ['Socios', 'Préstamos', 'Multas']) {
@@ -79,7 +80,7 @@ describe('who sees what', () => {
       renderizar(<App />, { api, ruta, sesion: sesionDe('MEMBER', 'rosa@example.org') })
 
       expect(await screen.findByRole('heading', { name: 'Sin permiso' })).toBeTruthy()
-      expect(screen.getByRole('link', { name: 'Ir a mi inicio' }).getAttribute('href')).toBe('/cuenta')
+      expect(screen.getByRole('link', { name: 'Ir a mi inicio' }).getAttribute('href')).toBe('/inicio')
     },
   )
 
@@ -112,7 +113,7 @@ describe('who sees what', () => {
     await userEvent.type(screen.getByLabelText('Contraseña'), 'una-contrasena-larga')
     await userEvent.click(screen.getByRole('button', { name: 'Entrar' }))
 
-    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeTruthy()
   })
 
   it('returns to the sign-in, saying why, when the session ends by itself', async () => {

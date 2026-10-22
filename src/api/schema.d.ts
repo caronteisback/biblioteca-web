@@ -161,7 +161,7 @@ export interface paths {
         };
         /**
          * Get the signed-in user
-         * @description The signed-in user. For a member it carries the member data, with the score and the alerts calculated now.
+         * @description The signed-in user, with the lending rules. For a member it carries the member data, with the score and the alerts calculated now.
          */
         get: operations["getMe"];
         put?: never;
@@ -604,6 +604,8 @@ export interface components {
             activo: boolean;
             /** @description DUE_SOON or OVERDUE for an active loan; empty once returned. */
             alertas: components["schemas"]["Alerta"][];
+            /** @description Code of the borrowed copy, so a screen can name it without a second call. */
+            codigoEjemplar: string;
             /**
              * Format: int32
              * @description Days late as of today for an active loan, or up to the return date for a returned one. Zero when on time.
@@ -637,6 +639,31 @@ export interface components {
             renovaciones: number;
             /** Format: int64 */
             socioId: number;
+            /** @description Title of the book the borrowed copy belongs to, so a screen can name the loan without a second call. */
+            tituloLibro: string;
+        };
+        /** @description The lending rules the API applies, so a screen can show a member how close they are to a limit without copying the numbers. */
+        ReglasDePrestamo: {
+            /**
+             * Format: int32
+             * @description Days granted by a loan and by each renewal.
+             */
+            diasPlazo: number;
+            /**
+             * Format: int32
+             * @description Active loans a member may have at once; with that many, a new loan is refused with LOAN_LIMIT_REACHED.
+             */
+            maxPrestamosActivos: number;
+            /**
+             * Format: int32
+             * @description Renewals allowed per loan.
+             */
+            maxRenovaciones: number;
+            /**
+             * Format: int32
+             * @description A member whose score is below this cannot start new loans (MEMBER_BLOCKED_BY_SCORE).
+             */
+            puntajeMinimo: number;
         };
         SocioRequest: {
             /** Format: email */
@@ -676,6 +703,7 @@ export interface components {
             email: string;
             /** Format: int64 */
             id: number;
+            reglas: components["schemas"]["ReglasDePrestamo"];
             /** @enum {string} */
             rol: "LIBRARIAN" | "MEMBER";
             /** @description The member data, with score and alerts, when the role is MEMBER; null for a librarian. */

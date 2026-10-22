@@ -18,7 +18,8 @@ export function formatearSoles(monto: number): string {
 }
 
 /** A loan is "Devuelto" when returned, "Vencido" when active and late, "Activo" otherwise. */
-export function estadoDelPrestamo(prestamo: { activo: boolean; diasRetraso: number }): string {
+export function estadoDelPrestamo(prestamo: { activo: boolean; diasRetraso: number; alertas?: { code: string }[] }): string {
   if (!prestamo.activo) return 'Devuelto'
-  return prestamo.diasRetraso > 0 ? 'Vencido' : 'Activo'
+  if (prestamo.diasRetraso > 0) return 'Vencido'
+  return prestamo.alertas?.some((alerta) => alerta.code === 'DUE_SOON') ? 'Vence pronto' : 'Activo'
 }

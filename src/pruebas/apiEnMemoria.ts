@@ -1,6 +1,7 @@
 import type { Alerta, Api, Ejemplar, Libro, Multa, Pagina, Prestamo, Rol, Socio, Usuario } from '../api/cliente.ts'
 import { ApiError } from '../api/errores.ts'
 import { obtenerSesion } from '../sesion/estado.ts'
+import { REGLAS } from './reglas.ts'
 
 /** The librarian that every in-memory library starts with. */
 export const BIBLIOTECARIA = { email: 'bibliotecaria@example.org', password: 'una-contrasena-larga' }
@@ -76,7 +77,7 @@ export function crearApiEnMemoria() {
     const cuenta = cuentas.get(email)
     if (!cuenta) throw new ApiError(401, 'UNAUTHENTICATED', null)
     const socio = cuenta.socioId === null ? null : vistaSocio(buscar(socios, cuenta.socioId, 'MEMBER_NOT_FOUND'))
-    return { id: cuenta.id, email, rol: cuenta.rol, socio }
+    return { id: cuenta.id, email, rol: cuenta.rol, socio, reglas: REGLAS }
   }
   const socioDeLaSesion = (): number => {
     const sesion = obtenerSesion()
@@ -210,7 +211,8 @@ export function crearApiEnMemoria() {
         if (!ejemplar.disponible) throw new ApiError(409, 'COPY_ALREADY_ON_LOAN', null)
         if (pendientesDe(socioId).length > 0) throw new ApiError(422, 'MEMBER_HAS_PENDING_FINE', null)
         const prestamo: Prestamo = {
-          id: nuevoId(), socioId, ejemplarId, fechaPrestamo: HOY, fechaVencimiento: sumarDias(HOY, DIAS_DE_PRESTAMO),
+          id: nuevoId(), socioId, ejemplarId, codigoEjemplar: ejemplar.codigo,
+          tituloLibro: libros.find((libro) => libro.id === ejemplar.libroId)?.titulo ?? '', fechaPrestamo: HOY, fechaVencimiento: sumarDias(HOY, DIAS_DE_PRESTAMO),
           fechaDevolucion: null, renovaciones: 0, activo: true, diasRetraso: 0, alertas: [], multa: null,
         }
         prestamos.push(prestamo)

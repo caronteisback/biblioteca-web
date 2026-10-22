@@ -4,7 +4,7 @@ import { destinoTrasEntrar, inicioDe } from './inicio.ts'
 describe('inicioDe', () => {
   it('starts each role where it works, and nobody at the sign-in', () => {
     expect(inicioDe('LIBRARIAN')).toBe('/libros')
-    expect(inicioDe('MEMBER')).toBe('/cuenta')
+    expect(inicioDe('MEMBER')).toBe('/inicio')
     expect(inicioDe(null)).toBe('/login')
   })
 })
@@ -12,7 +12,7 @@ describe('inicioDe', () => {
 describe('destinoTrasEntrar', () => {
   it('starts at the home of the role when nobody asked for a screen', () => {
     expect(destinoTrasEntrar('LIBRARIAN', null)).toBe('/libros')
-    expect(destinoTrasEntrar('MEMBER', null)).toBe('/cuenta')
+    expect(destinoTrasEntrar('MEMBER', null)).toBe('/inicio')
   })
 
   it('takes a librarian back to any screen they asked for, search included', () => {
@@ -24,6 +24,11 @@ describe('destinoTrasEntrar', () => {
     expect(destinoTrasEntrar('LIBRARIAN', '/cuenta')).toBe('/libros')
   })
 
+  it('takes a member back to their home or their account when they asked for those', () => {
+    expect(destinoTrasEntrar('MEMBER', '/inicio')).toBe('/inicio')
+    expect(destinoTrasEntrar('MEMBER', '/cuenta')).toBe('/cuenta')
+  })
+
   it('takes a member back to the catalog they asked for', () => {
     expect(destinoTrasEntrar('MEMBER', '/libros')).toBe('/libros')
     expect(destinoTrasEntrar('MEMBER', '/libros?q=faro&page=1')).toBe('/libros?q=faro&page=1')
@@ -31,9 +36,9 @@ describe('destinoTrasEntrar', () => {
   })
 
   it.each(['/socios', '/socios/5', '/prestamos', '/multas', '/libros/nuevo', '/libros/7/editar', '/algo-que-no-existe'])(
-    'takes a member to their account instead of a refusal when they asked for %s',
+    'takes a member to their home instead of a refusal when they asked for %s',
     (pedido) => {
-      expect(destinoTrasEntrar('MEMBER', pedido)).toBe('/cuenta')
+      expect(destinoTrasEntrar('MEMBER', pedido)).toBe('/inicio')
     },
   )
 })

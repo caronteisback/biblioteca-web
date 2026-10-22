@@ -44,6 +44,10 @@ const TEXTO: [string, string][] = [
 const BORDES: [string, string][] = [
   ['borde-campo', 'superficie'],
   ['acento', 'superficie'],
+  // The zones of a gauge are drawn on the card of the gauge, which has the page colour.
+  ['zona-ok', 'fondo'],
+  ['zona-aviso', 'fondo'],
+  ['zona-error', 'fondo'],
 ]
 
 describe.each([

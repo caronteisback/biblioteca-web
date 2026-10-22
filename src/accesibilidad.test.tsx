@@ -59,6 +59,7 @@ describe('accessibility of every screen (axe)', () => {
 describe('accessibility of the sign-in and of what a member sees (axe)', () => {
   it.each([
     ['the sign-in', '/login', null, 'Entrar'],
+    ['the home of a member', '/inicio', 'MEMBER', 'Tus préstamos activos'],
     ['my account', '/cuenta', 'MEMBER', 'Mis préstamos activos'],
     ['the refusal a member gets for a librarian screen', '/socios', 'MEMBER', 'Sin permiso'],
     ['the catalog, read by a member', '/libros', 'MEMBER', 'El Faro Imaginado'],

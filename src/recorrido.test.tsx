@@ -113,16 +113,24 @@ describe('the life of a loan through the whole application', () => {
     memoria.envejecerPrestamos(19)
     renderizar(<App />, { api: memoria.api, ruta: '/socios', sesion: null })
 
-    // The member asked for a librarian screen before signing in; after it, they land in their own account, not on a refusal.
+    // The member asked for a librarian screen before signing in; after it, they land on their own home, not on a refusal.
     await escribir('Correo', 'rosa@example.org')
     await escribir('Contraseña', 'una-contrasena-larga')
     await pulsar('Entrar')
-    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Inicio' })).toBeTruthy()
 
-    // Their own account shows their loan, overdue, and only theirs.
+    // The home shows how they stand, the overdue loan named by its book, and only theirs.
+    expect(await screen.findByText('Tu puntaje')).toBeTruthy()
+    expect(screen.getByText('Libros en préstamo')).toBeTruthy()
     expect(await screen.findByText('Vencido (5 d)')).toBeTruthy()
-    expect(screen.getAllByText(/Préstamo #/)).toHaveLength(1)
+    expect(screen.getAllByText('El Faro Imaginado')).toHaveLength(1)
+    expect(screen.getByText('Tienes un préstamo vencido: devuélvelo cuanto antes.')).toBeTruthy()
     expect(screen.queryByText('Mateo Quispe')).toBeNull()
+
+    // "Mi cuenta" keeps the detail.
+    await ir(/^Mi cuenta$/)
+    expect(await screen.findByRole('heading', { name: 'Mi cuenta' })).toBeTruthy()
+    expect(await screen.findByText('Vencido (5 d)')).toBeTruthy()
 
     // The catalog is there to read.
     await ir(/^Libros$/)

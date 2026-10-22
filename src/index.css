@@ -16,6 +16,9 @@
   --aviso-fondo: #fcefd2;
   --neutro: #4f5b6b;
   --neutro-fondo: #e8ebf0;
+  --zona-ok: #1e8e4e;
+  --zona-aviso: #b9770e;
+  --zona-error: #d03a3a;
   color-scheme: light;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
@@ -41,6 +44,9 @@
   --aviso-fondo: #3a2d12;
   --neutro: #b8c1ce;
   --neutro-fondo: #2a323e;
+  --zona-ok: #4cc47b;
+  --zona-aviso: #e8a93a;
+  --zona-error: #ef6b6b;
   color-scheme: dark;
 }
 
@@ -718,6 +724,98 @@ main:focus {
   .apilable td.acciones:empty {
     display: none;
   }
+}
+
+/* The home of a member */
+.inicio-medidores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.velocimetro {
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+  text-align: center;
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+}
+
+.velocimetro figcaption {
+  color: var(--suave);
+  font-size: 0.9rem;
+}
+
+.velocimetro > svg {
+  display: block;
+  width: 100%;
+  max-width: 15rem;
+  margin: 0.25rem auto 0;
+}
+
+.zona {
+  fill: none;
+  stroke-width: 14;
+}
+
+.zona-ok {
+  stroke: var(--zona-ok);
+}
+
+.zona-aviso {
+  stroke: var(--zona-aviso);
+}
+
+.zona-error {
+  stroke: var(--zona-error);
+}
+
+.aguja {
+  stroke: var(--texto);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.eje {
+  fill: var(--texto);
+}
+
+.velocimetro-valor {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.velocimetro-valor strong {
+  font-size: 1.6rem;
+}
+
+.tarjetas {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+  list-style: none;
+}
+
+.tarjeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+}
+
+.tarjeta strong {
+  display: block;
+}
+
+.tarjeta small {
+  display: block;
 }
 
 @media (prefers-reduced-motion: reduce) {

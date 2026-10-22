@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { crearApi, crearCliente } from './cliente.ts'
 import { avisoDeCierre, iniciarSesion, obtenerSesion, reiniciarSesionParaPruebas } from '../sesion/estado.ts'
 import { ApiError } from './errores.ts'
+import { REGLAS } from '../pruebas/reglas.ts'
 
 const json = (cuerpo: unknown, estado = 200) =>
   new Response(JSON.stringify(cuerpo), { status: estado, headers: { 'Content-Type': 'application/json' } })
@@ -55,7 +56,7 @@ describe('the session in the client', () => {
   const sesion = {
     token: 'el-token-de-la-sesion',
     expiraEn: new Date(Date.now() + 3_600_000).toISOString(),
-    usuario: { id: 1, email: 'bibliotecaria@example.org', rol: 'LIBRARIAN' as const, socio: null },
+    usuario: { id: 1, email: 'bibliotecaria@example.org', rol: 'LIBRARIAN' as const, socio: null, reglas: REGLAS },
   }
   const pagina = { items: [], page: 0, size: 20, totalElements: 0, totalPages: 0 }
 

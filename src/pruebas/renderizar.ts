@@ -7,6 +7,7 @@ import { ApiContext } from '../api/contexto.ts'
 import { guardarPlegado } from '../lateral/plegado.ts'
 import { iniciarSesion, reiniciarSesionParaPruebas, type Sesion } from '../sesion/estado.ts'
 import { reiniciarTemaParaPruebas } from '../tema/estado.ts'
+import { REGLAS } from './reglas.ts'
 
 afterEach(() => {
   cleanup()
@@ -20,7 +21,7 @@ export function sesionDe(rol: Rol, email = rol === 'LIBRARIAN' ? 'bibliotecaria@
   return {
     token: `token-de-${email}`,
     expiraEn: new Date(Date.now() + 3_600_000).toISOString(),
-    usuario: { id: 1, email, rol, socio: null },
+    usuario: { id: 1, email, rol, socio: null, reglas: REGLAS },
   }
 }
 

@@ -7,12 +7,13 @@ import { ApiError, MENSAJES } from '../api/errores.ts'
 import { renderizar } from '../pruebas/renderizar.ts'
 import { cerrarSesion, obtenerSesion } from '../sesion/estado.ts'
 import { LoginPagina } from './LoginPagina.tsx'
+import { REGLAS } from '../pruebas/reglas.ts'
 
 const respuesta = (rol: 'LIBRARIAN' | 'MEMBER') => ({
   token: 'el-token',
   tipo: 'Bearer',
   expiraEn: new Date(Date.now() + 3_600_000).toISOString(),
-  usuario: { id: 1, email: 'ana@example.org', rol, socio: null },
+  usuario: { id: 1, email: 'ana@example.org', rol, socio: null, reglas: REGLAS },
 })
 
 function pantalla(entrar: unknown, ruta = '/login', estado?: unknown) {
@@ -20,7 +21,7 @@ function pantalla(entrar: unknown, ruta = '/login', estado?: unknown) {
     <Routes>
       <Route path="/login" element={<LoginPagina />} />
       <Route path="/libros" element={<p>Pantalla de libros</p>} />
-      <Route path="/cuenta" element={<p>Pantalla de mi cuenta</p>} />
+      <Route path="/inicio" element={<p>Pantalla de inicio</p>} />
       <Route path="/prestamos" element={<p>Pantalla de préstamos</p>} />
     </Routes>,
     { api: { auth: { entrar } }, ruta: estado ? ({ pathname: ruta, state: estado } as unknown as string) : ruta, sesion: null },
@@ -45,12 +46,12 @@ describe('LoginPagina', () => {
     expect(obtenerSesion()?.token).toBe('el-token')
   })
 
-  it('opens "my account" for a member', async () => {
+  it('opens the home for a member', async () => {
     pantalla(vi.fn().mockResolvedValue(respuesta('MEMBER')))
 
     await rellenar()
 
-    expect(await screen.findByText('Pantalla de mi cuenta')).toBeTruthy()
+    expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
   })
 
   it('goes where the user was heading before being asked to sign in', async () => {
@@ -66,7 +67,7 @@ describe('LoginPagina', () => {
 
     await rellenar()
 
-    expect(await screen.findByText('Pantalla de mi cuenta')).toBeTruthy()
+    expect(await screen.findByText('Pantalla de inicio')).toBeTruthy()
   })
 
   it.each(['https://sitio-ajeno.example/robo', '//sitio-ajeno.example', 'javascript:alert(1)'])(

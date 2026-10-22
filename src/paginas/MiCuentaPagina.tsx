@@ -61,8 +61,9 @@ export function MiCuentaPagina() {
               <ul className="lista-simple">
                 {lista.items.map((prestamo) => (
                   <li key={prestamo.id}>
-                    Préstamo #{prestamo.id} · prestado el {formatearDia(prestamo.fechaPrestamo)} · vence el{' '}
-                    {formatearDia(prestamo.fechaVencimiento)} <EtiquetaDePrestamo prestamo={prestamo} />
+                    <strong>{prestamo.tituloLibro}</strong> · ejemplar {prestamo.codigoEjemplar} · prestado el{' '}
+                    {formatearDia(prestamo.fechaPrestamo)} · vence el {formatearDia(prestamo.fechaVencimiento)}{' '}
+                    <EtiquetaDePrestamo prestamo={prestamo} />
                   </li>
                 ))}
               </ul>

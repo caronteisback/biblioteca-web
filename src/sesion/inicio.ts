@@ -1,14 +1,14 @@
 import type { Rol } from '../api/cliente.ts'
 
-/** Where each role starts: the librarian in the catalog, the member in their own account. Nobody signed in goes to sign in. */
+/** Where each role starts: the librarian in the catalog, the member at their home. Nobody signed in goes to sign in. */
 export function inicioDe(rol: Rol | null): string {
   if (rol === 'LIBRARIAN') return '/libros'
-  if (rol === 'MEMBER') return '/cuenta'
+  if (rol === 'MEMBER') return '/inicio'
   return '/login'
 }
 
-/** The catalog screens that a member may read (the list and one book), with any search in the address. */
-const LECTURA_DE_SOCIO = /^\/libros(\/\d+)?(\?.*)?$/
+/** The screens a member may open: their home and account, and the catalog (the list and one book, with any search in the address). */
+const LECTURA_DE_SOCIO = /^\/(inicio|cuenta|libros(\/\d+)?(\?.*)?)$/
 
 /**
  * Where to go after signing in. The user is taken back to the screen they were heading for, but only when their

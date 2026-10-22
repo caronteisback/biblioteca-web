@@ -2,6 +2,28 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4.0] - 2026-10-22
+
+**Needs the API 0.4.0** (contract v0.3.0): the home of a member reads `reglas` from `/me` and the title of each loan.
+
+### Added
+
+- **Inicio**, the home of a member (`/inicio`): a greeting, what needs attention, two gauges and the books they have now.
+  - **Tu puntaje** (0 to 100): red below the minimum to borrow (the member is blocked), amber up to 80, green from 80. The minimum comes from the API.
+  - **Libros en préstamo** (active loans against the limit, from the API): green up to half the limit, amber while there is room ("Te queda 1"), red when the limit is reached.
+  - Each gauge says its title, its number and its zone in words with an icon: the drawing is decoration (`aria-hidden`), so the colour is never the only clue.
+  - **Tus préstamos activos**: each loan named by its book and copy, with its state (active, **due soon**, overdue).
+  - Alerts in the second person: a pending fine, a low score and an overdue loan.
+- The member's menu starts with **Inicio** and a member lands there after signing in (or goes back to the home, the account or the catalog they asked for).
+- **Libro** and **Ejemplar** (code) in the librarian's list of loans, and the book in "Mi cuenta", instead of `#id`.
+- A loan that is about to be due shows **Vence pronto** (amber) in every list.
+- Colours `--zona-ok`, `--zona-aviso` and `--zona-error` for the gauges, checked at 3:1 in both themes by `contraste.test.ts`.
+- Tests: 238 (from 192): the zones, the gauge, the screen in every combination and the whole journey of a member.
+
+### Changed
+
+- Contract v0.3.0; the in-memory library of the tests sends `reglas` and the titles too.
+
 ## [0.3.0] - 2026-10-21
 
 A new look; no screen changes what it does and the API and the contract are untouched.

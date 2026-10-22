@@ -73,6 +73,7 @@ export function PrestamosPagina() {
                     <tr role="row">
                       <th scope="col" role="columnheader">Préstamo</th>
                       <th scope="col" role="columnheader">Socio</th>
+                      <th scope="col" role="columnheader">Libro</th>
                       <th scope="col" role="columnheader">Ejemplar</th>
                       <th scope="col" role="columnheader">Prestado</th>
                       <th scope="col" role="columnheader">Vence</th>
@@ -88,7 +89,8 @@ export function PrestamosPagina() {
                         <td role="cell" data-label="Socio">
                           <Link to={`/socios/${prestamo.socioId}`}>#{prestamo.socioId}</Link>
                         </td>
-                        <td role="cell" data-label="Ejemplar">#{prestamo.ejemplarId}</td>
+                        <td role="cell" data-label="Libro">{prestamo.tituloLibro}</td>
+                        <td role="cell" data-label="Ejemplar">{prestamo.codigoEjemplar}</td>
                         <td role="cell" data-label="Prestado">{formatearDia(prestamo.fechaPrestamo)}</td>
                         <td role="cell" data-label="Vence">{formatearDia(prestamo.fechaVencimiento)}</td>
                         <td role="cell" data-label="Estado">

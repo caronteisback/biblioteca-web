@@ -4,6 +4,7 @@ import { NoEncontrada } from './componentes/NoEncontrada.tsx'
 import { RutaProtegida } from './componentes/RutaProtegida.tsx'
 import { LibroDetallePagina } from './paginas/LibroDetallePagina.tsx'
 import { LibroFormPagina } from './paginas/LibroFormPagina.tsx'
+import { InicioPagina } from './paginas/InicioPagina.tsx'
 import { LibrosPagina } from './paginas/LibrosPagina.tsx'
 import { LoginPagina } from './paginas/LoginPagina.tsx'
 import { MiCuentaPagina } from './paginas/MiCuentaPagina.tsx'
@@ -38,6 +39,14 @@ function App() {
         }
       >
         <Route index element={<Inicio />} />
+        <Route
+          path="inicio"
+          element={
+            <RutaProtegida roles={['MEMBER']}>
+              <InicioPagina />
+            </RutaProtegida>
+          }
+        />
         <Route path="libros" element={<LibrosPagina />} />
         <Route
           element={

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { REGLAS } from '../pruebas/reglas.ts'
 import {
   avisoDeCierre,
   cerrarSesion,
@@ -14,7 +15,7 @@ import {
 const sesion = (expiraEn: string, rol: 'LIBRARIAN' | 'MEMBER' = 'LIBRARIAN'): Sesion => ({
   token: 'un-token',
   expiraEn,
-  usuario: { id: 1, email: 'bibliotecaria@example.org', rol, socio: null },
+  usuario: { id: 1, email: 'bibliotecaria@example.org', rol, socio: null, reglas: REGLAS },
 })
 const enUnaHora = () => new Date(Date.now() + 3_600_000).toISOString()
 
