@@ -1,15 +1,30 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { cerrarSesion } from '../sesion/estado.ts'
 import { useSesion } from '../sesion/useSesion.ts'
+import { Icono, type NombreDeIcono } from './Iconos.tsx'
 import { LimiteDeError } from './LimiteDeError.tsx'
+import { MenuDeUsuario } from './MenuDeUsuario.tsx'
+
+function Entrada({ to, icono, children }: { to: string; icono: NombreDeIcono; children: string }) {
+  return (
+    <NavLink to={to}>
+      <Icono nombre={icono} />
+      {children}
+    </NavLink>
+  )
+}
 
 export function Layout() {
   const { pathname } = useLocation()
   const navegar = useNavigate()
-  const { sesion, rol } = useSesion()
+  const { rol } = useSesion()
   const principal = useRef<HTMLElement>(null)
   const primeraVez = useRef(true)
+  // Open only for the screen it was opened on: choosing another screen closes it without an effect.
+  const [lateralAbiertoEn, setLateralAbiertoEn] = useState<string | null>(null)
+  const lateralAbierto = lateralAbiertoEn === pathname
+  const setLateralAbierto = (valor: boolean) => setLateralAbiertoEn(valor ? pathname : null)
 
   // In a single-page app the browser does not announce a new page: move the focus to the content when the
   // screen changes (not on the first load, which would steal the focus from the address bar).
@@ -27,37 +42,59 @@ export function Layout() {
   }
 
   return (
-    <>
+    <div className="aplicacion" onKeyDown={(evento) => evento.key === 'Escape' && setLateralAbierto(false)}>
       <a className="salto" href="#contenido">
         Saltar al contenido
       </a>
-      <header className="cabecera">
+      <aside id="lateral" className={lateralAbierto ? 'lateral abierto' : 'lateral'}>
         <strong className="marca">Biblioteca</strong>
         <nav aria-label="Principal">
-          <NavLink to="/libros">Libros</NavLink>
+          <Entrada to="/libros" icono="libros">
+            Libros
+          </Entrada>
           {rol === 'LIBRARIAN' && (
             <>
-              <NavLink to="/socios">Socios</NavLink>
-              <NavLink to="/prestamos">Préstamos</NavLink>
-              <NavLink to="/multas">Multas</NavLink>
+              <Entrada to="/socios" icono="socios">
+                Socios
+              </Entrada>
+              <Entrada to="/prestamos" icono="prestamos">
+                Préstamos
+              </Entrada>
+              <Entrada to="/multas" icono="multas">
+                Multas
+              </Entrada>
             </>
           )}
-          {rol === 'MEMBER' && <NavLink to="/cuenta">Mi cuenta</NavLink>}
+          {rol === 'MEMBER' && (
+            <Entrada to="/cuenta" icono="cuenta">
+              Mi cuenta
+            </Entrada>
+          )}
         </nav>
-        {sesion && (
-          <div className="usuario">
-            <span title={sesion.usuario.rol === 'LIBRARIAN' ? 'Bibliotecario' : 'Socio'}>{sesion.usuario.email}</span>
-            <button type="button" onClick={salir}>
-              Salir
-            </button>
+      </aside>
+      {lateralAbierto && <div className="velo" aria-hidden="true" onClick={() => setLateralAbierto(false)} />}
+      <div className="contenedor">
+        <header className="barra">
+          <button
+            type="button"
+            className="hamburguesa"
+            aria-label="Menú principal"
+            aria-expanded={lateralAbierto}
+            aria-controls="lateral"
+            onClick={() => setLateralAbierto(!lateralAbierto)}
+          >
+            <Icono nombre="menu" tamano={20} />
+          </button>
+          <MenuDeUsuario onSalir={salir} />
+        </header>
+        <main id="contenido" tabIndex={-1} ref={principal}>
+          <div className="pagina">
+            <LimiteDeError key={pathname}>
+              <Outlet />
+            </LimiteDeError>
           </div>
-        )}
-      </header>
-      <main id="contenido" tabIndex={-1} ref={principal}>
-        <LimiteDeError key={pathname}>
-          <Outlet />
-        </LimiteDeError>
-      </main>
-    </>
+        </main>
+      </div>
+    </div>
   )
 }

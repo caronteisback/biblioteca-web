@@ -5,6 +5,7 @@ import { useApi } from '../api/contexto.ts'
 import { ActividadDelSocio } from '../componentes/ActividadDelSocio.tsx'
 import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
+import { Estado } from '../componentes/Estado.tsx'
 import { NoEncontrada } from '../componentes/NoEncontrada.tsx'
 import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
@@ -56,9 +57,7 @@ function SocioDetalle({ id }: { id: number }) {
               <dd>{formatearDia(socio.fechaRegistro)}</dd>
               <dt>Estado</dt>
               <dd>
-                <span className={`etiqueta ${socio.activo ? 'etiqueta-disponible' : 'etiqueta-de-baja'}`}>
-                  {socio.activo ? 'Activo' : 'Desactivado'}
-                </span>
+                <Estado tono={socio.activo ? 'ok' : 'neutro'}>{socio.activo ? 'Activo' : 'Desactivado'}</Estado>
               </dd>
               <dt>Puntaje</dt>
               <dd>

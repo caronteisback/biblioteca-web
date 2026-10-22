@@ -4,6 +4,7 @@ import type { EstadoMulta } from '../api/cliente.ts'
 import { useApi } from '../api/contexto.ts'
 import { AvisoError } from '../componentes/AvisoError.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
+import { Estado } from '../componentes/Estado.tsx'
 import { Paginacion } from '../componentes/Paginacion.tsx'
 import { Titulo } from '../componentes/Titulo.tsx'
 import { useCargar } from '../hooks/useCargar.ts'
@@ -99,11 +100,9 @@ export function MultasPagina() {
                         <td>{formatearDia(multa.fechaGeneracion)}</td>
                         <td>
                           {multa.estado === 'PENDING' ? (
-                            <span className="etiqueta etiqueta-vencido">Pendiente</span>
+                            <Estado tono="error">Pendiente</Estado>
                           ) : (
-                            <span className="etiqueta etiqueta-devuelto">
-                              Pagada{multa.fechaPago ? ` el ${formatearDia(multa.fechaPago)}` : ''}
-                            </span>
+                            <Estado tono="ok">Pagada{multa.fechaPago ? ` el ${formatearDia(multa.fechaPago)}` : ''}</Estado>
                           )}
                         </td>
                         <td className="acciones">

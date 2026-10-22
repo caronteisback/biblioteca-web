@@ -7,8 +7,11 @@ import { useSesion } from '../sesion/useSesion.ts'
 import { estadoDelEjemplar } from '../formato.ts'
 import { AvisoError } from './AvisoError.tsx'
 import { CargaVista } from './CargaVista.tsx'
+import { Estado, type Tono } from './Estado.tsx'
 
 const MAXIMO = 100
+
+const TONO_DEL_EJEMPLAR: Record<string, Tono> = { Disponible: 'ok', Prestado: 'aviso', 'De baja': 'neutro' }
 
 /** The copies of one book, with the commands to add, retire, restore and delete them. */
 export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
@@ -67,9 +70,7 @@ export function EjemplaresDelLibro({ libroId }: { libroId: number }) {
                       <tr key={ejemplar.id}>
                         <td>{ejemplar.codigo}</td>
                         <td>
-                          <span className={`etiqueta etiqueta-${estadoDelEjemplar(ejemplar).toLowerCase().replace(' ', '-')}`}>
-                            {estadoDelEjemplar(ejemplar)}
-                          </span>
+                          <Estado tono={TONO_DEL_EJEMPLAR[estadoDelEjemplar(ejemplar)]}>{estadoDelEjemplar(ejemplar)}</Estado>
                         </td>
                         {puedeGestionar && (
                           <td className="acciones">

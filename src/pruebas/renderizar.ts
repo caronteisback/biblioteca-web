@@ -5,10 +5,12 @@ import { afterEach } from 'vitest'
 import type { Api, Pagina, Rol } from '../api/cliente.ts'
 import { ApiContext } from '../api/contexto.ts'
 import { iniciarSesion, reiniciarSesionParaPruebas, type Sesion } from '../sesion/estado.ts'
+import { reiniciarTemaParaPruebas } from '../tema/estado.ts'
 
 afterEach(() => {
   cleanup()
   reiniciarSesionParaPruebas()
+  reiniciarTemaParaPruebas()
 })
 
 /** A session as the sign-in would leave it, valid for an hour. */

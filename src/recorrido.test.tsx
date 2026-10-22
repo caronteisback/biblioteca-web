@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App.tsx'
 import { MENSAJES } from './api/errores.ts'
 import { BIBLIOTECARIA, crearApiEnMemoria } from './pruebas/apiEnMemoria.ts'
+import { salirDelPanel } from './pruebas/menu.ts'
 import { renderizar } from './pruebas/renderizar.ts'
 
 afterEach(() => vi.restoreAllMocks())
@@ -95,7 +96,7 @@ describe('the life of a loan through the whole application', () => {
     expect(await screen.findByText('Pagada el 21/10/2026')).toBeTruthy()
 
     // Signing out ends the session: the panel asks again for the credentials.
-    await pulsar('Salir')
+    await salirDelPanel()
     expect(await screen.findByLabelText('Correo')).toBeTruthy()
   })
 

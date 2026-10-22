@@ -2,6 +2,29 @@
 
 All notable changes are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3.0] - 2026-10-21
+
+A new look; no screen changes what it does and the API and the contract are untouched.
+
+### Added
+
+- **Side menu.** The menu moves from the top to a column on the left, with an icon per screen. On a phone it folds away behind a menu button and closes by itself when a screen is chosen (or with Escape).
+- **User menu** at the top right: the person's name and role, a switch between the light and the dark theme, and "Salir". It closes with Escape, with a click elsewhere, with Tab and when the screen changes.
+- **Light and dark theme.** The panel starts light; the choice is kept in the browser (`localStorage`) and applied before the first screen is drawn. The colours are variables in one place (`index.css`).
+- **One set of status colours**, the `Estado` component: green is fine (active, available, paid), amber needs attention (lent out), red is a problem (overdue, pending fine) and gray is inactive (returned, deactivated, retired). Every status carries an icon and its words as well, so colour is never the only clue.
+- `contraste.test.ts` checks every pair of colours of both themes (4.5:1 for text, 3:1 for a field's border), since axe cannot judge colour in jsdom. It found a green that fell short (4.36:1) before it reached anyone.
+
+### Changed
+
+- The pages sit on a card over a pale background instead of directly on the page.
+- "Salir" moved into the user menu; the tests sign out through it.
+- Tests: 184 (from 144).
+
+### Fixed
+
+- On a phone the user menu button had no accessible name once its text was hidden with `display: none`; it is now hidden visually and stays announced. Found by running axe in a real browser, which the jsdom tests cannot do because they do not load the styles.
+- The actions column of the fines table had its cell borders out of line.
+
 ## [0.2.2] - 2026-10-21
 
 ### Fixed

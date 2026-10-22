@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { useApi } from '../api/contexto.ts'
 import { Buscador } from '../componentes/Buscador.tsx'
 import { CargaVista } from '../componentes/CargaVista.tsx'
+import { Estado } from '../componentes/Estado.tsx'
 import { Paginacion } from '../componentes/Paginacion.tsx'
 import { Titulo } from '../componentes/Titulo.tsx'
 import { useBusqueda } from '../hooks/useBusqueda.ts'
@@ -55,9 +56,7 @@ export function SociosPagina() {
                         <td>{socio.email}</td>
                         <td>{formatearDia(socio.fechaRegistro)}</td>
                         <td>
-                          <span className={`etiqueta ${socio.activo ? 'etiqueta-disponible' : 'etiqueta-de-baja'}`}>
-                            {socio.activo ? 'Activo' : 'Desactivado'}
-                          </span>
+                          <Estado tono={socio.activo ? 'ok' : 'neutro'}>{socio.activo ? 'Activo' : 'Desactivado'}</Estado>
                         </td>
                       </tr>
                     ))}

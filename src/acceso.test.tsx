@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from './App.tsx'
 import { BIBLIOTECARIA, crearApiEnMemoria } from './pruebas/apiEnMemoria.ts'
+import { salirDelPanel } from './pruebas/menu.ts'
 import { renderizar, sesionDe } from './pruebas/renderizar.ts'
 import { obtenerSesion } from './sesion/estado.ts'
 
@@ -95,7 +96,7 @@ describe('who sees what', () => {
     const { api } = await biblioteca()
     renderizar(<App />, { api, ruta: '/libros' })
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Salir' }))
+    await salirDelPanel()
 
     expect(await screen.findByLabelText('Correo')).toBeTruthy()
     expect(obtenerSesion()).toBeNull()
@@ -105,7 +106,7 @@ describe('who sees what', () => {
   it('does not send the next person who signs in to the screen the previous one was on', async () => {
     const { api } = await biblioteca()
     renderizar(<App />, { api, ruta: '/libros' })
-    await userEvent.click(await screen.findByRole('button', { name: 'Salir' }))
+    await salirDelPanel()
 
     await userEvent.type(await screen.findByLabelText('Correo'), 'rosa@example.org')
     await userEvent.type(screen.getByLabelText('Contraseña'), 'una-contrasena-larga')
