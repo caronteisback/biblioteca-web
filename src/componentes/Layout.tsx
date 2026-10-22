@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
+import { guardarPlegado, leerPlegado } from '../lateral/plegado.ts'
 import { cerrarSesion } from '../sesion/estado.ts'
 import { useSesion } from '../sesion/useSesion.ts'
 import { Icono, type NombreDeIcono } from './Iconos.tsx'
@@ -8,9 +9,9 @@ import { MenuDeUsuario } from './MenuDeUsuario.tsx'
 
 function Entrada({ to, icono, children }: { to: string; icono: NombreDeIcono; children: string }) {
   return (
-    <NavLink to={to}>
+    <NavLink to={to} title={children}>
       <Icono nombre={icono} />
-      {children}
+      <span className="texto-del-menu">{children}</span>
     </NavLink>
   )
 }
@@ -24,6 +25,8 @@ export function Layout() {
   // Open only for the screen it was opened on: choosing another screen closes it without an effect.
   const [lateralAbiertoEn, setLateralAbiertoEn] = useState<string | null>(null)
   const lateralAbierto = lateralAbiertoEn === pathname
+  // On a wide screen the menu can be folded to its icons; on a phone it slides in and out instead.
+  const [plegado, setPlegado] = useState(leerPlegado)
   const setLateralAbierto = (valor: boolean) => setLateralAbiertoEn(valor ? pathname : null)
 
   // In a single-page app the browser does not announce a new page: move the focus to the content when the
@@ -36,18 +39,28 @@ export function Layout() {
     principal.current?.focus()
   }, [pathname])
 
+  function alternarPlegado() {
+    setPlegado(!plegado)
+    guardarPlegado(!plegado)
+  }
+
   function salir() {
     cerrarSesion()
     navegar('/login', { replace: true })
   }
 
   return (
-    <div className="aplicacion" onKeyDown={(evento) => evento.key === 'Escape' && setLateralAbierto(false)}>
+    <div className={plegado ? 'aplicacion plegado' : 'aplicacion'} onKeyDown={(evento) => evento.key === 'Escape' && setLateralAbierto(false)}>
       <a className="salto" href="#contenido">
         Saltar al contenido
       </a>
       <aside id="lateral" className={lateralAbierto ? 'lateral abierto' : 'lateral'}>
-        <strong className="marca">Biblioteca</strong>
+        <strong className="marca">
+          <span className="marca-corta" aria-hidden="true">
+            B
+          </span>
+          <span className="texto-del-menu">Biblioteca</span>
+        </strong>
         <nav aria-label="Principal">
           <Entrada to="/libros" icono="libros">
             Libros
@@ -82,6 +95,16 @@ export function Layout() {
             aria-expanded={lateralAbierto}
             aria-controls="lateral"
             onClick={() => setLateralAbierto(!lateralAbierto)}
+          >
+            <Icono nombre="menu" tamano={20} />
+          </button>
+          <button
+            type="button"
+            className="plegador"
+            aria-label={plegado ? 'Expandir el menú' : 'Contraer el menú'}
+            aria-expanded={!plegado}
+            aria-controls="lateral"
+            onClick={alternarPlegado}
           >
             <Icono nombre="menu" tamano={20} />
           </button>

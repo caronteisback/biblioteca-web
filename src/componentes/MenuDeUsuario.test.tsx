@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '../App.tsx'
 import { crearApiEnMemoria } from '../pruebas/apiEnMemoria.ts'
 import { abrirMenuDeUsuario } from '../pruebas/menu.ts'
@@ -80,5 +80,54 @@ describe('the side menu on a small screen', () => {
     await userEvent.click(boton)
     await userEvent.click(screen.getByRole('link', { name: 'Multas' }))
     expect(lateral.classList.contains('abierto')).toBe(false)
+  })
+})
+
+describe('the side menu on a wide screen', () => {
+  beforeEach(() => localStorage.removeItem('biblioteca.lateral'))
+
+  it('folds to its icons and opens again, keeping every link reachable by name', async () => {
+    panel()
+    const boton = await screen.findByRole('button', { name: 'Contraer el menú' })
+    const aplicacion = document.querySelector('.aplicacion') as HTMLElement
+    expect(boton.getAttribute('aria-expanded')).toBe('true')
+    expect(aplicacion.classList.contains('plegado')).toBe(false)
+
+    await userEvent.click(boton)
+
+    expect(aplicacion.classList.contains('plegado')).toBe(true)
+    const abrir = screen.getByRole('button', { name: 'Expandir el menú' })
+    expect(abrir.getAttribute('aria-expanded')).toBe('false')
+    for (const nombre of ['Libros', 'Socios', 'Préstamos', 'Multas']) {
+      expect(screen.getByRole('link', { name: nombre }).getAttribute('title')).toBe(nombre)
+    }
+
+    await userEvent.click(abrir)
+    expect(aplicacion.classList.contains('plegado')).toBe(false)
+  })
+
+  it('remembers the choice for the next visit', async () => {
+    panel()
+    await userEvent.click(await screen.findByRole('button', { name: 'Contraer el menú' }))
+    expect(localStorage.getItem('biblioteca.lateral')).toBe('plegado')
+    cleanup()
+
+    panel()
+    expect((await screen.findByRole('button', { name: 'Expandir el menú' })).getAttribute('aria-expanded')).toBe('false')
+    expect(document.querySelector('.aplicacion')?.classList.contains('plegado')).toBe(true)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Expandir el menú' }))
+    expect(localStorage.getItem('biblioteca.lateral')).toBeNull()
+  })
+
+  it('starts open when the storage is blocked', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+
+    panel()
+
+    expect((await screen.findByRole('button', { name: 'Contraer el menú' })).getAttribute('aria-expanded')).toBe('true')
+    vi.restoreAllMocks()
   })
 })

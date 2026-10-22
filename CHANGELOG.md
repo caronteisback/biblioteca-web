@@ -9,6 +9,7 @@ A new look; no screen changes what it does and the API and the contract are unto
 ### Added
 
 - **Side menu.** The menu moves from the top to a column on the left, with an icon per screen. On a phone it folds away behind a menu button and closes by itself when a screen is chosen (or with Escape).
+- **The side menu folds to its icons on a wide screen** (a button next to it) and the choice is remembered in the browser; each icon keeps its name for screen readers and as a tooltip. On a phone the menu slides in as before.
 - **User menu** at the top right: the person's name and role, a switch between the light and the dark theme, and "Salir". It closes with Escape, with a click elsewhere, with Tab and when the screen changes.
 - **Light and dark theme.** The panel starts light; the choice is kept in the browser (`localStorage`) and applied before the first screen is drawn. The colours are variables in one place (`index.css`).
 - **One set of status colours**, the `Estado` component: green is fine (active, available, paid), amber needs attention (lent out), red is a problem (overdue, pending fine) and gray is inactive (returned, deactivated, retired). Every status carries an icon and its words as well, so colour is never the only clue.
@@ -18,7 +19,8 @@ A new look; no screen changes what it does and the API and the contract are unto
 
 - The pages sit on a card over a pale background instead of directly on the page.
 - "Salir" moved into the user menu; the tests sign out through it.
-- Tests: 184 (from 144).
+- Tests: 187 (from 144).
+- Small screens: titles with an action, inline forms and the member sheet wrap instead of overflowing; the sheet stacks its labels over their values. Checked in a real browser on every screen at 390 and 768 px (no horizontal scroll outside the tables, which scroll inside their own box; axe finds nothing).
 
 ### Fixed
 
